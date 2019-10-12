@@ -4,7 +4,7 @@ A LED-eket vezérlő áramkörök egymás után vannak bekötve úgy, hogy az eg
 
 Egyszálú az adatátvitel, fontos a protokoll betartása, ahhoz, hogy adatokat tudjunk megjeleníteni a LED-fűzéren.
 
-Amikor egy áramkör megkap egy 24 bit-es kódot, akkor ezt addig tárolja amíg más kódot nem kapna, vagy a tápforrást el nem veszti.
+Amikor egy áramkör megkap egy 24 bit-es kódot, akkor ezt addig tárolja amíg más kódot nem kap, vagy a tápforrást el nem veszti.
 
 A 24 bit-es kód a következőképpen kell kinézzen:
 

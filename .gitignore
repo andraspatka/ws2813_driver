@@ -1,2 +1,6 @@
 *.xpr
 *.txt
+*.log
+*.synctex.gz
+*.aux
+*.out

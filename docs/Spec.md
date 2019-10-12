@@ -11,7 +11,7 @@ output: pdf_document
 
 # Bevezető
 
-A projekt fő célja egy LED-fűzér vezérlése és ennek segítségével egy reklámszöveg megjelenítése. Ehhez egy FPGA lapot és egy Worldsemi WS2813 ledfűzér lesz felhasználva.
+A projekt fő célja egy LED-fűzér vezérlése és ennek segítségével egy reklámszöveg megjelenítése. Ehhez egy FPGA lap és egy Worldsemi WS2813 ledfűzér lesz felhasználva.
 
 # Követelmények
 
