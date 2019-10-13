@@ -1,12 +1,10 @@
 % !TEX TS-program = pdflatex
 % !TEX encoding = UTF-8 Unicode
 
-% This is a simple template for a LaTeX document using the "article" class.
-% See "book", "report", "letter" for other types of document.
-
-\documentclass[11pt]{article} % use larger type; default would be 10pt
+\documentclass[10pt]{article} % use larger type; default would be 10pt
 
 \usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+
 \usepackage{siunitx}
 \usepackage{hyperref}
 
@@ -22,6 +20,7 @@
 %   read geometry.pdf for detailed page layout information
 
 \usepackage{graphicx} % support the \includegraphics command and options
+\graphicspath{ {../diagrams/} }
 
 % \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
 
@@ -35,6 +34,8 @@
 
 %%% HEADERS & FOOTERS
 \usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\usepackage{t1enc}
+\usepackage[hungarian]{babel}
 \pagestyle{fancy} % options: empty , plain , fancy
 \renewcommand{\headrulewidth}{0pt} % customise the layout...
 \lhead{}\chead{}\rhead{}
@@ -53,12 +54,9 @@
 
 %%% END Article customizations
 
-%%% The "real" document content comes below...
-
 \title{Programozható LED-fűzéren alapuló reklámpanel - LED füzér vezérlése, adatok kiírása}
 \author{Patka Zsolt-András | Számítástechnika BSc}
-\date{2019.10.12} % Activate to display a given date or no date (if empty),
-         % otherwise the current date is printed 
+\date{2019.10.12}
 
 \begin{document}
 \maketitle
@@ -79,7 +77,7 @@ A projekt fő célja egy LED-fűzér vezérlése és ennek segítségével egy r
 \end{itemize}	
 \end{itemize}
 
-\section{Modulok}
+\section{Állapotok}
 
 Állapotok:
 \begin{itemize}
@@ -102,6 +100,26 @@ A projekt fő célja egy LED-fűzér vezérlése és ennek segítségével egy r
 \item DISPLAY
 	\item megtörtént a kiírás
 \end{itemize}
+
+\includegraphics[scale=0.5]{allapotdiagram.png}
+
+\section{Modulok}
+
+\begin{itemize}
+\item Következő állapot regiszter \textbf{\textit{Next State Register}}
+\item Állapot regiszter \textbf{\textit{State Register}}
+\item Szín regiszter \textbf{\textit{Colour Register}}
+\item Küldési logika regiszter \textbf{\textit{Transmission Logic Register}}
+\end{itemize}
+
+\includegraphics[scale=0.5]{tombvazlat.png}
+
+\subsection{Küldési logika regiszter}
+
+\noindent A küldési logika modul részletesebb lebontása: 
+
+\includegraphics[scale=0.6]{kuldesi_logika.png}
+
 
 \section{WS2813 egyszálú adatátvitel protokoll leírása}
 
@@ -138,7 +156,7 @@ Az adatátvitel a következő sorrendben kell történjen:
 
 \subsection{Időzítések}
 
-Minden 24 bit-es adatátvitel után kell legalább 50 u s-ot várakozni. Ez jelzi azt, hogy egy 24 bit-es blokk továbbítása megtörtént.
+Minden 24 bit-es adatátvitel után kell legalább \SI{50}{\micro\second}-ot várakozni. Ez jelzi azt, hogy egy 24 bit-es blokk továbbítása megtörtént.
 
 \noindent Az egyes bit-ek átvitele a következőképp történik:
 
