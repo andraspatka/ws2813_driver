@@ -20,7 +20,7 @@
 %   read geometry.pdf for detailed page layout information
 
 \usepackage{graphicx} % support the \includegraphics command and options
-\graphicspath{ {../diagrams/} }
+\graphicspath{ {../diagrams/}, {../time_diagrams/} }
 
 % \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
 
@@ -56,31 +56,42 @@
 
 \title{Programozható LED-fűzéren alapuló reklámpanel - LED füzér vezérlése, adatok kiírása}
 \author{Patka Zsolt-András | Számítástechnika BSc}
-\date{2019.10.12}
+\date{2019.10.28}
 
 \begin{document}
 \maketitle
 
 \section{Beveztő}
 
-A projekt fő célja egy LED-fűzér vezérlése és ennek segítségével egy reklámszöveg megjelenítése. Ehhez egy FPGA lap és egy Worldsemi WS2813 ledfűzér lesz felhasználva.
+A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy reklámszöveg megjelenítése. Ehhez egy FPGA lap és egy Worldsemi WS2813 ledfűzér lesz felhasználva.
 
 \section{Követelmények}
 
 \subsection{Funkcionális követelmények}
 \begin{itemize}
-\item Lehetséges legyen egy reklámszöveget kiírni a ledfűzér által létrehozott mátrix-ra.
-\item Másodpercenként min. 60 frissítés
+\item Lehetséges legyen egy reklámszöveget kiírni a ledfűzérek által létrehozott mátrix-ra.
+\item Az egyes ledfűzérek szinkronba működjenek
+\item A kiírás párhuzamosan történik az adott ledfűzéreken
 \end{itemize}
 
+\subsection{Nem funkcionális követelmények}
 \begin{itemize}
-\item Protokoll helyes használata
+\item Benti használatra van tervezve
+\item Ha az FPGA-lapnak lesz készítve külön tokozat, akkor IP31-es standardnak kell megfeleljen
+\item Ha az FPGA-lapnak nem lesz készítve külön tokozat, akkor nem felel meg IP standardnak (IP00)
+\end{itemize}
+
+\subsection{Fejlesztési követelmények}
+\begin{itemize}
+\item WS2813 egyszálú adatátvitel protokolljának helyes használata
+\item Implementáció VHDL nyelvben
+\item Szimulációs állomány a rendszer tesztelésére
 \item Adatok kiírása lehetséges a LED fűzérre
 \item Opcionális: 
 \begin{itemize}
 	\item Pár betű kódolása (3-4)
 	\item Betük tárolása BRAM memóriában
-\end{itemize}	
+\end{itemize}
 \end{itemize}
 
 \section{Specifikáció}
@@ -89,10 +100,12 @@ A projekt fő célja egy LED-fűzér vezérlése és ennek segítségével egy r
 \item Worldsemi WS2813 90 LED-es ledfűzér van felhasználva
 \item Digilent Basys3 FPGA vezérli a ledfűzért 
 \item Egy sorban 18 LED
-\item Öt ledfűzér van egymás alá 
+\item Öt ledfűzér van egymás alá helyezve
 \end{itemize}
 
 \section{Állapotok}
+
+\textbf{2019.10.14}
 
 Állapotok:
 \begin{itemize}
@@ -118,8 +131,15 @@ A projekt fő célja egy LED-fűzér vezérlése és ennek segítségével egy r
 
 \includegraphics[scale=0.5]{allapotdiagram.png}
 
+\textbf{2019.10.28}
+
+Állapotdiagram átírva úgy, hogy a küldési logikát is tartalmazza:
+
+\includegraphics[scale=0.4]{allapotdiagram_2.png}
+
 \section{Modulok}
 
+\textbf{2019.10.14}
 \begin{itemize}
 \item Következő állapot regiszter \textbf{\textit{Next State Register}}
 \item Állapot regiszter \textbf{\textit{State Register}}
@@ -171,7 +191,7 @@ Az adatátvitel a következő sorrendben kell történjen:
 
 \subsection{Időzítések}
 
-Minden 24 bit-es adatátvitel után kell legalább \SI{50}{\micro\second}-ot várakozni. Ez jelzi azt, hogy egy 24 bit-es blokk továbbítása megtörtént.
+Minden 24 bit-es adatátvitel után kell legalább \SI{50}{\micro\second}-ot várakozni, alacsony feszűltségen. Ez jelzi azt, hogy egy 24 bit-es blokk továbbítása megtörtént.
 
 \noindent Az egyes bit-ek átvitele a következőképp történik:
 
@@ -188,7 +208,7 @@ Minden 24 bit-es adatátvitel után kell legalább \SI{50}{\micro\second}-ot vá
 	\end{itemize}
 \item 24 bit-es adatblokk küldése után: 
 	\begin{itemize}
-		\item $ > \SI{50}{\micro\second}$
+		\item $ > \SI{50}{\micro\second}$-ot alacsony feszűltségen
 	\end{itemize}
 \end{itemize}
 
@@ -198,5 +218,18 @@ A várakozási értékeket nem az adatlapból, hanem az \href{https://learn.adaf
 
 Egyelőre megpróbálok az útmutatóban megadott értékekkel dolgozni. Ha ez nem megfelelő működéshez vezet, akkor veszem az adatlapban levő értékeket.
 
+\section{Idődiagram}
+
+\includegraphics[scale=0.6]{general.PNG}
+
+\begin{itemize}
+\item CLK: 100 MHZ-es órajel
+\item start: jel a folyamat elindításához
+\item reset: jel a folyamat resetálásához
+\item stop: jel a kiírás megállításához. Csak két 24 bit-es blokk kiírása közben tudja megállítani a kiírást
+\item Dout: Egyszálú adatsín a LED-ekre.
+\item Data: Kiírandó adat, Data-rd felmenő órajelére olvassa be az adatot.
+\item Data-rd: Aktiváló bit az adat beolvasására
+\end{itemize}
 
 \end{document}
