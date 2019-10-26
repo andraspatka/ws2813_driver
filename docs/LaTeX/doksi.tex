@@ -67,6 +67,12 @@ A projekt fő célja egy LED-fűzér vezérlése és ennek segítségével egy r
 
 \section{Követelmények}
 
+\subsection{Funkcionális követelmények}
+\begin{itemize}
+\item Lehetséges legyen egy reklámszöveget kiírni a ledfűzér által létrehozott mátrix-ra.
+\item Másodpercenként min. 60 frissítés
+\end{itemize}
+
 \begin{itemize}
 \item Protokoll helyes használata
 \item Adatok kiírása lehetséges a LED fűzérre
@@ -75,6 +81,15 @@ A projekt fő célja egy LED-fűzér vezérlése és ennek segítségével egy r
 	\item Pár betű kódolása (3-4)
 	\item Betük tárolása BRAM memóriában
 \end{itemize}	
+\end{itemize}
+
+\section{Specifikáció}
+
+\begin{itemize}
+\item Worldsemi WS2813 90 LED-es ledfűzér van felhasználva
+\item Digilent Basys3 FPGA vezérli a ledfűzért 
+\item Egy sorban 18 LED
+\item Öt ledfűzér van egymás alá 
 \end{itemize}
 
 \section{Állapotok}
