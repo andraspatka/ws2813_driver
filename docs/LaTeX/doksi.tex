@@ -83,7 +83,6 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 
 \subsection{Fejlesztési követelmények}
 \begin{itemize}
-\item WS2813 egyszálú adatátvitel protokolljának helyes használata
 \item Implementáció VHDL nyelvben
 \item Szimulációs állomány a rendszer tesztelésére
 \item Adatok kiírása lehetséges a LED fűzérre
@@ -94,9 +93,10 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 \end{itemize}
 \end{itemize}
 
-\section{Specifikáció}
+\section{Rendszer-specifikáció}
 
 \begin{itemize}
+\item WS2813 egyszálú adatátvitel protokolljának helyes használata
 \item Worldsemi WS2813 90 LED-es ledfűzér van felhasználva
 \item Digilent Basys3 FPGA vezérli a ledfűzért 
 \item Egy sorban 18 LED
@@ -154,6 +154,13 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 \noindent A küldési logika modul részletesebb lebontása: 
 
 \includegraphics[scale=0.6]{kuldesi_logika.png}
+
+\textbf{2019.10.28}
+
+\indent Minden \textbf{led-controll} modulhoz tartozik egy BRAM blokk és minden ilyen modul egy ledfűzért vezérel meg. Öt ilyen blokk megvezérel öt ledfűzért, ezáltal létrehozva a ledmátrixot.
+Az órajel, start, reset, stop és data-rd jelek közösek minden modulnak.
+
+\includegraphics[scale=0.5]{tombvazlat2.png}
 
 
 \section{WS2813 egyszálú adatátvitel protokoll leírása}
