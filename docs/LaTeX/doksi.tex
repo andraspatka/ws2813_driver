@@ -1,16 +1,14 @@
 % !TEX TS-program = pdflatex
 % !TEX encoding = UTF-8 Unicode
 
+% Compile with: pdflatex doski.tex
+
 \documentclass[10pt]{article} % use larger type; default would be 10pt
 
 \usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
 
 \usepackage{siunitx}
 \usepackage{hyperref}
-
-%%% Examples of Article customizations
-% These packages are optional, depending whether you want the features they provide.
-% See the LaTeX Companion or other references for full information.
 
 %%% PAGE DIMENSIONS
 \usepackage{geometry} % to change the page dimensions
@@ -70,6 +68,7 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 \subsection{Funkcionális követelmények}
 \begin{itemize}
 \item Lehetséges legyen egy reklámszöveget kiírni a ledfűzérek által létrehozott mátrix-ra.
+\item Egy sorban 90 LED található
 \item Az egyes ledfűzérek szinkronba működjenek
 \item A kiírás párhuzamosan történik az adott ledfűzéreken
 \end{itemize}
@@ -99,8 +98,6 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 \item WS2813 egyszálú adatátvitel protokolljának helyes használata
 \item Worldsemi WS2813 90 LED-es ledfűzér van felhasználva
 \item Digilent Basys3 FPGA vezérli a ledfűzért 
-\item Egy sorban 18 LED
-\item Öt ledfűzér van egymás alá helyezve
 \end{itemize}
 
 \section{Állapotok}
@@ -136,6 +133,10 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 Állapotdiagram átírva úgy, hogy a küldési logikát is tartalmazza:
 
 \includegraphics[scale=0.4]{allapotdiagram_2.png}
+
+Állapotdiagram egy 100 LED-et vezérlő modulra
+
+\includegraphics[scale=0.3]{allapotdiagram_3.png}
 
 \section{Modulok}
 
@@ -230,7 +231,7 @@ Egyelőre megpróbálok az útmutatóban megadott értékekkel dolgozni. Ha ez n
 \includegraphics[scale=0.6]{general.PNG}
 
 \begin{itemize}
-\item CLK: 100 MHZ-es órajel
+\item CLK: 100 MHz-es órajel
 \item start: jel a folyamat elindításához
 \item reset: jel a folyamat resetálásához
 \item stop: jel a kiírás megállításához. Csak két 24 bit-es blokk kiírása közben tudja megállítani a kiírást
