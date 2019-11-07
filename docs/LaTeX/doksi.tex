@@ -136,7 +136,39 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 
 Állapotdiagram egy 100 LED-et vezérlő modulra
 
-\includegraphics[scale=0.3]{allapotdiagram_3.png}
+\includegraphics[scale=0.4]{allapotdiagram_3.png}
+
+\textbf{2019.11.07}
+
+Végleges állapotdiagram, az implementációban is használt.
+
+\includegraphics[scale=0.5]{allapotdiagram_final.png}
+
+TODO: Dokumentáció befejezése!
+\begin{itemize}
+\item READY
+	\begin{itemize}
+	\item Alap állapot 
+	\item "reset" jel esetén ide kerül vissza az automata
+	\end{itemize}
+\item INIT
+	\begin{itemize}
+	\item inicializálja a bit-count-ot nullára
+	\end{itemize}
+\item SENDIF`_01
+	\begin{itemize}
+	\item inicializálja a bit-count-ot nullára
+	\end{itemize}
+\item RENDER
+	\begin{itemize}
+	\item egyenként küldi a szín információt a LED-ekre
+	\item annyiszor végződik el itt a művelet, ahány LED-ünk van
+	\item "stop" jel esetén megáll a kiírás
+	\end{itemize}
+\item DISPLAY
+	\item megtörtént a kiírás
+\end{itemize}
+
 
 \section{Modulok}
 

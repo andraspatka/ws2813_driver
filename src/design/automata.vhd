@@ -40,13 +40,9 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity automata is
     generic (
-        T0H  : integer := 40;
-        T0L  : integer := 85;
-        T1H  : integer := 80;
-        T1L  : integer := 45;
-        TRES : integer := 5000;
+        N : integer := 5;
         LED_TOTAL : integer := 10
-    );  
+    );
     port (
         clk_100 : in std_logic; --100MHz clock
         start   : in std_logic;
@@ -59,52 +55,8 @@ entity automata is
 end automata;
 
 architecture Behavioral of automata is
-    type state_type is (READY, INIT, RENDER, DISPLAY);
-    signal current_state, next_state: state_type;
-    signal led_nr : integer range 0 to 15;
-    signal bit_count : integer range 0 to 23;
-    signal k : integer range 0 to 5100;
 
 begin
-    SR: process(clk_100, reset) --State register
-    begin
-        if (reset = '1') then
-            current_state <= READY;
-        elsif (clk_100'event and clk_100 = '1') then
-            current_state <= next_state;
-        end if;
-    end process;
-    
-    process(current_state, start, stop)
-    begin
-        case current_state is
-            when READY =>
-                if start = '1' then
-                    next_state <= INIT;
-                else
-                    next_state <= READY;
-                end if;
-            when INIT =>
-                next_state <= RENDER;
-            when others =>
-                next_state <= current_state;
-        end case;        
-    end process;
-    
-    process(clk_100, current_state, data_rd)
-    begin
-        if (data_rd = '1') then --Data incoming
-            if (data = '1') then
-                d_out <= '1';
-                k <= k + 1;
-                if (k = T1H) then
-                    k <= 0;
-                end if;
-            else
-                
-            end if;
-        end if;
-    end process;
     
 
 end Behavioral;
