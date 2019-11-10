@@ -94,7 +94,7 @@ begin
     end process;
     
     -- Next State Logic Register
-    NSR: process(current_state, start, i)
+    NSR: process(current_state, start, i, clk_100)
     begin
         case current_state is
             when READY =>
@@ -121,7 +121,9 @@ begin
                 d_out <= '1';
                 next_state <= SEND1H;
             when SEND1H =>
-                i <= i - 1;
+                if (clk_100'event and clk_100 = '1') then
+                    i <= i - 1;
+                end if;
                 if i = 0 then
                     next_state <= SEND1L_INIT;
                 else
@@ -133,7 +135,9 @@ begin
                 d_out <= '0';
                 next_state <= SEND1L;
             when SEND1L => -- TODO: refactor into function
-                i <= i - 1;
+                if (clk_100'event and clk_100 = '1') then
+                    i <= i - 1;
+                end if;
                 if i = 0 then
                     next_state <= SHIFT_CHECK;
                 else
@@ -146,7 +150,9 @@ begin
                 d_out <= '1';
                 next_state <= SEND0H;
             when SEND0H =>
-                i <= i - 1;
+                if (clk_100'event and clk_100 = '1') then
+                    i <= i - 1;
+                end if;
                 if i = 0 then
                     next_state <= SEND0L_INIT;
                 else
@@ -157,7 +163,9 @@ begin
                 d_out <= '0';
                 next_state <= SEND0L;
             when SEND0L =>
-                i <= i - 1;
+                if (clk_100'event and clk_100 = '1') then
+                    i <= i - 1;
+                end if;
                 if i = 0 then
                     next_state <= SHIFT_CHECK;
                 else
@@ -177,7 +185,9 @@ begin
                 i <= TRES;
                 d_out <= '0';
             when SENDRES =>
-                i <= i - 1;
+                if (clk_100'event and clk_100 = '1') then
+                    i <= i - 1;
+                end if;
                 if i = 0 then
                     next_state <= SEND_DONE;
                 else
