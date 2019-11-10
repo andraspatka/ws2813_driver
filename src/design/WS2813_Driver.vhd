@@ -48,6 +48,13 @@ architecture Behavioral of WS2813_Driver is
     constant T1L  : integer := 45;
     constant TRES : integer := 5000;
     
+    --Values for debugging
+    --constant T0H  : integer := 4;
+    --constant T0L  : integer := 8;
+    --constant T1H  : integer := 8;
+    --constant T1L  : integer := 4;
+    --constant TRES : integer := 10;
+    
     type state_type is (
         READY,
         INIT,
@@ -77,7 +84,7 @@ architecture Behavioral of WS2813_Driver is
     
 begin
     --State register
-    SR: process(clk_100, reset) 
+    SR: process(clk_100, next_state, reset) 
     begin
         if (reset = '1') then
             current_state <= READY;
@@ -99,6 +106,7 @@ begin
                 end if;
             when INIT =>
                 bit_count <= 0;
+                r_data <= data;
                 next_state <= SEND_IF01;
             when SEND_IF01 =>
                 if r_data(23) = '1' then
@@ -182,6 +190,6 @@ begin
         end case;        
     end process;
     
-    r_data <= data;
+    
     
 end Behavioral;
