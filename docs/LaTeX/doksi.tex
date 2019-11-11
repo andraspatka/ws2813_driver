@@ -52,9 +52,9 @@
 
 %%% END Article customizations
 
-\title{Programozható LED-fűzéren alapuló reklámpanel - LED füzér vezérlése, adatok kiírása}
+\title{Programozható LED-fűzéren alapuló reklámpanel - LED fűzér vezérlése, adatok kiírása}
 \author{Patka Zsolt-András | Számítástechnika BSc}
-\date{2019.10.28}
+\date{2019.11.11}
 
 \begin{document}
 \maketitle
@@ -68,7 +68,7 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 \subsection{Funkcionális követelmények}
 \begin{itemize}
 \item Lehetséges legyen egy reklámszöveget kiírni a ledfűzérek által létrehozott mátrix-ra.
-\item Egy sorban 90 LED található
+\item Egy sorban 100 LED található
 \item Az egyes ledfűzérek szinkronba működjenek
 \item A kiírás párhuzamosan történik az adott ledfűzéreken
 \item Másodpercenként 60 frissítés (60 Hz)
@@ -209,7 +209,7 @@ TODO: Dokumentáció befejezése!
 \item SHIFT\_CHECK
 	\begin{itemize}
 	\item Megnézi, hogy a \textbf{bit\_count} változó 24-e, ha igen, akkor tovább megy a \textbf{SENDRES\_INIT} állapotra
-	\item Ha a \textbf{bit\_count} változó nem egyenlő 24-el, akkor vissza megy a \textbf{SEND\_IF01} állapotra
+	\item Ha a \textbf{bit\_count} változó nem egyenlő 24-el, akkor shift-eli a \textbf{data} std logic vectort balra eggyel; vissza megy a \textbf{SEND\_IF01} állapotra
 	\end{itemize}
 \item SENDRES\_INIT
 	\begin{itemize}
