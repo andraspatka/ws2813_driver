@@ -71,6 +71,8 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 \item Egy sorban 90 LED található
 \item Az egyes ledfűzérek szinkronba működjenek
 \item A kiírás párhuzamosan történik az adott ledfűzéreken
+\item Másodpercenként 60 frissítés (60 Hz)
+\item Mozgó szöveg
 \end{itemize}
 
 \subsection{Nem funkcionális követelmények}
@@ -85,6 +87,11 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 \item Implementáció VHDL nyelvben
 \item Szimulációs állomány a rendszer tesztelésére
 \item Adatok kiírása lehetséges a LED fűzérre
+\item Modularitás
+\begin{itemize}
+	\item Külön modul egy 24 bit-es blokk küldésére
+	\item Külön modul a 24 bit-es blokkokat küldő modulok használatára (paraméterezhető, bővíthető)
+\end{itemize}
 \item Opcionális: 
 \begin{itemize}
 	\item Pár betű kódolása (3-4)
@@ -138,7 +145,7 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 
 \includegraphics[scale=0.4]{allapotdiagram_3.png}
 
-\textbf{2019.11.07}
+\textbf{2019.11.11}
 
 Végleges állapotdiagram, az implementációban is használt.
 
@@ -155,20 +162,71 @@ TODO: Dokumentáció befejezése!
 	\begin{itemize}
 	\item inicializálja a bit-count-ot nullára
 	\end{itemize}
-\item SENDIF`_01
+\item SENDIF\_01
 	\begin{itemize}
-	\item inicializálja a bit-count-ot nullára
+	\item Megvizsgálja data[23]-as bit-et. Ha 1, akkor a következő állapot a \textbf{SEND1H\_INIT}, ha 0 akkor SEND0H\_INIT
 	\end{itemize}
-\item RENDER
+\item SEND1H\_INIT
 	\begin{itemize}
-	\item egyenként küldi a szín információt a LED-ekre
-	\item annyiszor végződik el itt a művelet, ahány LED-ünk van
-	\item "stop" jel esetén megáll a kiírás
+	\item Inicializálja az \textbf{i} változót a T1H értékre
+	\item A d\_out output-ot 1-re állítja
 	\end{itemize}
-\item DISPLAY
-	\item megtörtént a kiírás
+\item SEND1H
+	\begin{itemize}
+	\item Dekrementálja az \textbf{i} változót
+	\item Amikor az \textbf{i} változó nulla lesz, akkor tovább megy a \textbf{SEND1L\_INIT} állapotra
+	\end{itemize}
+\item SEND1L\_INIT
+	\begin{itemize}
+	\item Inicializálja az \textbf{i} változót a T1L értékre
+	\item A d\_out output-ot 0-ra állítja
+	\end{itemize}
+\item SEND1L
+	\begin{itemize}
+	\item Dekrementálja az \textbf{i} változót
+	\item Amikor az \textbf{i} változó nulla lesz, akkor tovább megy a \textbf{SHIFT\_CHECK} állapotra
+	\end{itemize}
+\item SEND0H\_INIT
+	\begin{itemize}
+	\item Inicializálja az \textbf{i} változót a T0H értékre
+	\item A d\_out output-ot 1-re állítja
+	\end{itemize}
+\item SEND0H
+	\begin{itemize}
+	\item Dekrementálja az \textbf{i} változót
+	\item Amikor az \textbf{i} változó nulla lesz, akkor tovább megy a \textbf{SEND0L\_INIT} állapotra
+	\end{itemize}
+\item SEND0L\_INIT
+	\begin{itemize}
+	\item Inicializálja az \textbf{i} változót a T0L értékre
+	\item A d\_out output-ot 0-ra állítja
+	\end{itemize}
+\item SEND0L
+	\begin{itemize}
+	\item Dekrementálja az \textbf{i} változót
+	\item Amikor az \textbf{i} változó nulla lesz, akkor tovább megy a \textbf{SHIFT\_CHECK} állapotra
+	\end{itemize}
+\item SHIFT\_CHECK
+	\begin{itemize}
+	\item Megnézi, hogy a \textbf{bit\_count} változó 24-e, ha igen, akkor tovább megy a \textbf{SENDRES\_INIT} állapotra
+	\item Ha a \textbf{bit\_count} változó nem egyenlő 24-el, akkor vissza megy a \textbf{SEND\_IF01} állapotra
+	\end{itemize}
+\item SENDRES\_INIT
+	\begin{itemize}
+	\item Inicializálja az \textbf{i} változót a TRES értékre
+	\item A d\_out output-ot 0-ra állítja
+	\end{itemize}
+\item SENDRES
+	\begin{itemize}
+	\item Dekrementálja az \textbf{i} változót
+	\item Amikor az \textbf{i} változó nulla lesz, akkor tovább megy a \textbf{SEND\_DONE} állapotra
+	\end{itemize}
+\item SEND\_DONE
+	\begin{itemize}
+	\item Befejeződött a 24 bit-es blokk kiírása
+	\item Beállítja a \textbf{done} kimenetet 1-esre
+	\end{itemize}
 \end{itemize}
-
 
 \section{Modulok}
 
@@ -190,7 +248,7 @@ TODO: Dokumentáció befejezése!
 
 \textbf{2019.10.28}
 
-\indent Minden \textbf{led-controll} modulhoz tartozik egy BRAM blokk és minden ilyen modul egy ledfűzért vezérel meg. Öt ilyen blokk megvezérel öt ledfűzért, ezáltal létrehozva a ledmátrixot.
+\indent Minden \textbf{led\_controll} modulhoz tartozik egy BRAM blokk és minden ilyen modul egy ledfűzért vezérel meg. Öt ilyen blokk megvezérel öt ledfűzért, ezáltal létrehozva a ledmátrixot.
 Az órajel, start, reset, stop és data-rd jelek közösek minden modulnak.
 
 \includegraphics[scale=0.5]{tombvazlat2.png}
@@ -268,8 +326,20 @@ Egyelőre megpróbálok az útmutatóban megadott értékekkel dolgozni. Ha ez n
 \item reset: jel a folyamat resetálásához
 \item stop: jel a kiírás megállításához. Csak két 24 bit-es blokk kiírása közben tudja megállítani a kiírást
 \item Dout: Egyszálú adatsín a LED-ekre.
-\item Data: Kiírandó adat, Data-rd felmenő órajelére olvassa be az adatot.
-\item Data-rd: Aktiváló bit az adat beolvasására
+\item Data: Kiírandó adat, Data\_rd felmenő órajelére olvassa be az adatot.
+\item Data\_rd: Aktiváló bit az adat beolvasására
+\end{itemize}
+
+\textbf{2019.11.11}
+
+\includegraphics[scale=0.6]{general2.PNG}
+
+\begin{itemize}
+\item CLK: 100 MHz-es órajel
+\item start: jel a folyamat elindításához
+\item reset: jel a folyamat resetálásához
+\item Dout: Egyszálú adatsín a LED-ekre.
+\item Data: Kiírandó adat
 \end{itemize}
 
 \end{document}

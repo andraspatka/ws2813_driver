@@ -11,12 +11,3 @@ Ez tartalmazza az általam írt dokumentációt, plusz a LED fűzér adatlapját
 ### src
 
 Ez a mappa tartalmazza a forráskódot. 
-
-TODO:
-Dokumentacio kiegeszitese:
- - Kovetelmenyek: 
-	- egy fuzeren 100 led
-	- masodpercenkent frissites, mozgo szoveg
-	- Modularitas:
-		- egy modul: 24 bit-es blokk
-		- Rdata <- adat
