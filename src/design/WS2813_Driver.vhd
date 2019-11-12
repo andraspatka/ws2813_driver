@@ -75,7 +75,8 @@ architecture Behavioral of WS2813_Driver is
         SENDRES_INIT,
         SENDRES,
         --done
-        SEND_DONE
+        SEND_DONE,
+        DONE_TODO -- TODO: rename this
     );
     signal current_state, next_state: state_type;
     signal bit_count : integer range 0 to 23;
@@ -195,6 +196,9 @@ begin
                 end if;
             when SEND_DONE =>
                 done <= '1';
+                next_state <= SEND_DONE;
+            when DONE_TODO =>
+                next_state <= DONE_TODO;
             when others =>
                 next_state <= current_state;
         end case;        
