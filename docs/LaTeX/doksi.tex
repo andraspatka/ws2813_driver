@@ -68,7 +68,7 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 \subsection{Funkcionális követelmények}
 \begin{itemize}
 \item Lehetséges legyen egy reklámszöveget kiírni a ledfűzérek által létrehozott mátrix-ra.
-\item Egy sorban 100 LED található
+\item Egy sorban minimum 100 LED található
 \item Az egyes ledfűzérek szinkronba működjenek
 \item A kiírás párhuzamosan történik az adott ledfűzéreken
 \item Másodpercenként 60 frissítés (60 Hz)
@@ -103,11 +103,13 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 
 \begin{itemize}
 \item WS2813 egyszálú adatátvitel protokolljának helyes használata
-\item Worldsemi WS2813 90 LED-es ledfűzér van felhasználva
+\item Worldsemi WS2813 100 LED-es ledfűzér van felhasználva
 \item Digilent Basys3 FPGA vezérli a ledfűzért 
 \end{itemize}
 
-\section{Állapotok}
+\section{Tervezés}
+
+\subsection{Állapotok}
 
 \textbf{2019.10.14}
 
@@ -151,7 +153,6 @@ Végleges állapotdiagram, az implementációban is használt.
 
 \includegraphics[scale=0.5]{allapotdiagram_final.png}
 
-TODO: Dokumentáció befejezése!
 \begin{itemize}
 \item READY
 	\begin{itemize}
@@ -228,7 +229,7 @@ TODO: Dokumentáció befejezése!
 	\end{itemize}
 \end{itemize}
 
-\section{Modulok}
+\subsection{Alegységek}
 
 \textbf{2019.10.14}
 \begin{itemize}
@@ -240,7 +241,7 @@ TODO: Dokumentáció befejezése!
 
 \includegraphics[scale=0.5]{tombvazlat.png}
 
-\subsection{Küldési logika regiszter}
+\subsubsection{Küldési logika regiszter}
 
 \noindent A küldési logika modul részletesebb lebontása: 
 
@@ -254,13 +255,13 @@ Az órajel, start, reset, stop és data-rd jelek közösek minden modulnak.
 \includegraphics[scale=0.5]{tombvazlat2.png}
 
 
-\section{WS2813 egyszálú adatátvitel protokoll leírása}
+\subsection{WS2813 egyszálú adatátvitel protokoll leírása}
 
 \indent A LED-eket vezérlő áramkörök egymás után vannak bekötve úgy, hogy az egyik áramkörnek az adatkimenete a következő áramkörnek az adatbemenetét képzi. Egyszálú az adatátvitel, fontos a protokoll betartása, ahhoz, hogy adatokat tudjunk megjeleníteni a LED-fűzéren.
 
 Amikor egy áramkör megkap egy 24 bit-es kódot, akkor ezt addig tárolja amíg más kódot nem kap, vagy a tápforrást el nem veszti.
 
-\subsection{A 24 bit-es kód}
+\subsubsection{A 24 bit-es kód}
 
 A 24 bit-es kód a következőképpen kell kinézzen:
 
@@ -273,7 +274,7 @@ Az adatátvitel a következő sorrendben kell történjen:
 	\item BLUE
 \end{enumerate}
 
-\subsection{Bit-ek küldési sorrendje}
+\subsubsection{Bit-ek küldési sorrendje}
 
 \textbf{Az egyes byte-ok küldését úgy kell elvégezni, hogy az MSB-vel kell kezdeni és haladni az LSB fele.}
 
@@ -287,7 +288,7 @@ Az adatátvitel a következő sorrendben kell történjen:
 \item \textbf{G7 G6 G5 G4 G3 G2 G1 G0 | R7 R6 R5 R4 R3 R2 R1 R0 | B7 B6 B5 B4 B3 B2 B1 B0}
 \end{itemize}
 
-\subsection{Időzítések}
+\subsubsection{Időzítések}
 
 Minden 24 bit-es adatátvitel után kell legalább \SI{50}{\micro\second}-ot várakozni, alacsony feszűltségen. Ez jelzi azt, hogy egy 24 bit-es blokk továbbítása megtörtént.
 
@@ -316,7 +317,7 @@ A várakozási értékeket nem az adatlapból, hanem az \href{https://learn.adaf
 
 Egyelőre megpróbálok az útmutatóban megadott értékekkel dolgozni. Ha ez nem megfelelő működéshez vezet, akkor veszem az adatlapban levő értékeket.
 
-\section{Idődiagram}
+\subsection{Idődiagram}
 
 \includegraphics[scale=0.6]{general.PNG}
 
