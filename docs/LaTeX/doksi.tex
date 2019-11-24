@@ -109,6 +109,142 @@ A projekt célja egy LED-fűzér vezérlése és ennek segítségével egy rekl�
 
 \section{Tervezés}
 
+
+\subsection{WS2813 egyszálú adatátvitel protokoll leírása}
+
+\indent A LED-eket vezérlő áramkörök egymás után vannak bekötve úgy, hogy az egyik áramkörnek az adatkimenete a következő áramkörnek az adatbemenetét képzi. Egyszálú az adatátvitel, fontos a protokoll betartása, ahhoz, hogy adatokat tudjunk megjeleníteni a LED-fűzéren.
+
+Amikor egy áramkör megkap egy 24 bit-es kódot, akkor ezt addig tárolja amíg más kódot nem kap, vagy a tápforrást el nem veszti.
+
+\subsubsection{A 24 bit-es kód}
+
+A 24 bit-es kód a következőképpen kell kinézzen:
+
+8 bit GREEN | 8 bit RED | 8 bit BLUE
+
+Az adatátvitel a következő sorrendben kell történjen: 
+\begin{enumerate}
+	\item GREEN
+	\item RED
+	\item BLUE
+\end{enumerate}
+
+\subsubsection{Bit-ek küldési sorrendje}
+
+\textbf{Az egyes byte-ok küldését úgy kell elvégezni, hogy az MSB-vel kell kezdeni és haladni az LSB fele.}
+
+\noindent 24 bit-es kód részletesebb felbontása: 
+\begin{itemize}
+\item \textit{G7 G6 G5 G4 G3 G2 G1 G0 | R7 R6 R5 R4 R3 R2 R1 R0 | B7 B6 B5 B4 B3 B2 B1 B0}
+\end{itemize}
+
+\noindent A küldés a következő sorrendben kell elvégződjön: 
+\begin{itemize}
+\item \textbf{G7 G6 G5 G4 G3 G2 G1 G0 | R7 R6 R5 R4 R3 R2 R1 R0 | B7 B6 B5 B4 B3 B2 B1 B0}
+\end{itemize}
+
+\subsubsection{Időzítések}
+
+Minden 24 bit-es adatátvitel után kell legalább \SI{50}{\micro\second}-ot várakozni, alacsony feszűltségen. Ez jelzi azt, hogy egy 24 bit-es blokk továbbítása megtörtént.
+
+\noindent Az egyes bit-ek átvitele a következőképp történik:
+
+\begin{itemize}
+\item Logikai 1-es
+	\begin{itemize}
+	\item \SI{0.8}{\micro\second}-ot magas feszűltségen
+	\item \SI{0.45}{\micro\second}-ot alacson feszűltségen
+	\end{itemize}
+\item Logikai 0-ás
+	\begin{itemize}
+	\item \SI{0.4}{\micro\second}-ot magas feszűltségen
+	\item \SI{0.85}{\micro\second}-ot alacson feszűltségen
+	\end{itemize}
+\item 24 bit-es adatblokk küldése után: 
+	\begin{itemize}
+		\item $ > \SI{50}{\micro\second}$-ot alacsony feszűltségen
+	\end{itemize}
+\end{itemize}
+
+\noindent A bit-ek továbbításánál egy +/- \SI{150}{\nano\second}-os eltérés megengedett.
+
+A várakozási értékeket nem az adatlapból, hanem az \href{https://learn.adafruit.com/adafruit-neopixel-uberguide}{alábbi} útmutatóból vettem. Az útmutató szerint az adatlapban levő értékek rosszul vannak kiszámolva.
+
+Egyelőre megpróbálok az útmutatóban megadott értékekkel dolgozni. Ha ez nem megfelelő működéshez vezet, akkor veszem az adatlapban levő értékeket.
+
+
+\subsection{Véges állapotú adatútas automata tervezése}
+
+A feladatot egy véges állapotú adatútas automatával fogom megoldani. Ennek megfelelően mutatom be a tervezést.
+
+\subsubsection{Elvégezendő RT műveletek azonosítása}
+
+Az időzítések implementálásához egy számláló lesz használva. A 100 MHz-es órajel ami fel lesz használva időben $\SI{0.01}{\micro\second}$-nak felel meg. 
+Így a szükséges ciklusok száma (amennyit várakoztatni kell bizonyos feszűltségszinten, ahhoz, hogy a WS2813 protokollja be legyen tartva) egész.
+Ebből már látható, hogy definiálható két művelet: $i \Leftarrow ciklus\_szam$, $i \Leftarrow i - 1$ (ahol i a számláló).
+
+\indent Az egyszerűség kedvéért, egy belső regiszternek, amely a színadatokat tartalmazza (\textbf{data}), mindig a 24. bitje kerül kiküldésre.
+Tehát minden bit kiküldése után ennek a regiszternek az értékeit el kell csúsztatni (shift-elni) egyet balra: $data \Leftarrow data << 1$
+
+\indent Egy 24-bites blokk kiküldése után kell küldeni egy "RES" jelet, vagyis több ideig alacsony feszűltségen kell tartani a kimenetet. 
+Ehhez számolni kell a már elküldött bitek számát $bit\_count \Leftarrow bit\_count + 1$, ahol bit\_count az eddig elküldött bitek számát tartalmazza.
+
+\subsubsection{Adatfüggőségek identifikálása}
+
+Mivel nagyon egyszerű RT műveletekkel meg lehet oldani az adott feladatot, nem merűlnek fel adatfüggőségek.
+
+\subsubsection{Célregiszterek azonosítása}
+
+Szükséges regiszterek:
+\begin{itemize}
+	\item $R_i$: ciklusszámláló regiszter a késleltetésekhez.
+	\item $R_{bit}$\_count: Biteket számláló regiszter, a 24 bit-es blokk elküldésének érzékeléséhez.
+	\item $R_{data}$: Elkündendő adatot tartalmazó regiszter
+\end{itemize}
+
+\subsubsection{Különböző fázisokban elvégzendő műveletek}
+
+\begin{table}[h!]
+	\begin{center}
+		\caption{Különböző fázisokban elvégzendő műveletek}
+		\begin{tabular}{l|c|c|c|c|c}
+		\textbf{Állapot} & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & d\_out 	 & done \\
+		\hline         
+		READY            & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & 'U' 	 & '0' \\
+		\hline         
+		INIT          	 & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & 'U' 	 & $done$ \\
+		\hline         
+		SEND\_IF01       & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & 'U' 	 & $done$ \\
+		\hline         
+		SEND1H\_INIT  	 & $T1H$ 	 & $R_{bit\_count}$     & $R_{data}$      & '1' 	 & $done$ \\
+		\hline         
+		SEND1H           & $R_i - 1$ & $R_{bit\_count}$     & $R_{data}$      & $d\_out$ & $done$ \\
+		\hline         
+		SEND1L\_INIT     & $T1L$     & $R_{bit\_count}$     & $R_{data}$      & '0'      & $done$ \\
+		\hline         
+		SEND1L           & $R_i - 1$ & $R_{bit\_count}$     & $R_{data}$      & $d\_out$ & $done$ \\
+		\hline         
+		SEND0H\_INIT     & $T0H$     & $R_{bit\_count}$     & $R_{data}$      & '1'      & $done$ \\
+		\hline         
+		SEND0H           & $R_i - 1$ & $R_{bit\_count}$     & $R_{data}$      & $d\_out$ & $done$ \\
+		\hline         
+		SEND0L\_INIT     & $T0L$     & $R_{bit\_count}$     & $R_{data}$      & '0'      & $done$ \\
+		\hline         
+		SEND0L           & $R_i - 1$ & $R_{bit\_count}$     & $R_{data}$      & $d\_out$ & $done$ \\
+		\hline
+		SHIFT\_CHECK     & $R_i$     & $R_{bit\_count} + 1$ & $R_{data} << 1$ & $d\_out$ & $done$ \\
+		\hline
+		SENDRES\_INIT    & $TRES$    & $R_{bit\_count}$     & $R_{data}$      & '0'      & $done$ \\
+		\hline
+		SENDRES          & $R_i - 1$ & $R_{bit\_count}$     & $R_{data}$      & $d\_out$ & $done$ \\
+		\hline
+		SEND\_DONE       & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & 'U' 	 & '1' \\
+		\hline
+		DONE\_TODO       & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & 'U' 	 & $done$ \\
+		\end{tabular}
+	\end{center}
+\end{table}
+
 \subsection{Állapotok}
 
 \textbf{2019.10.14}
@@ -255,67 +391,7 @@ Az órajel, start, reset, stop és data-rd jelek közösek minden modulnak.
 \includegraphics[scale=0.5]{tombvazlat2.png}
 
 
-\subsection{WS2813 egyszálú adatátvitel protokoll leírása}
 
-\indent A LED-eket vezérlő áramkörök egymás után vannak bekötve úgy, hogy az egyik áramkörnek az adatkimenete a következő áramkörnek az adatbemenetét képzi. Egyszálú az adatátvitel, fontos a protokoll betartása, ahhoz, hogy adatokat tudjunk megjeleníteni a LED-fűzéren.
-
-Amikor egy áramkör megkap egy 24 bit-es kódot, akkor ezt addig tárolja amíg más kódot nem kap, vagy a tápforrást el nem veszti.
-
-\subsubsection{A 24 bit-es kód}
-
-A 24 bit-es kód a következőképpen kell kinézzen:
-
-8 bit GREEN | 8 bit RED | 8 bit BLUE
-
-Az adatátvitel a következő sorrendben kell történjen: 
-\begin{enumerate}
-	\item GREEN
-	\item RED
-	\item BLUE
-\end{enumerate}
-
-\subsubsection{Bit-ek küldési sorrendje}
-
-\textbf{Az egyes byte-ok küldését úgy kell elvégezni, hogy az MSB-vel kell kezdeni és haladni az LSB fele.}
-
-\noindent 24 bit-es kód részletesebb felbontása: 
-\begin{itemize}
-\item \textit{G7 G6 G5 G4 G3 G2 G1 G0 | R7 R6 R5 R4 R3 R2 R1 R0 | B7 B6 B5 B4 B3 B2 B1 B0}
-\end{itemize}
-
-\noindent A küldés a következő sorrendben kell elvégződjön: 
-\begin{itemize}
-\item \textbf{G7 G6 G5 G4 G3 G2 G1 G0 | R7 R6 R5 R4 R3 R2 R1 R0 | B7 B6 B5 B4 B3 B2 B1 B0}
-\end{itemize}
-
-\subsubsection{Időzítések}
-
-Minden 24 bit-es adatátvitel után kell legalább \SI{50}{\micro\second}-ot várakozni, alacsony feszűltségen. Ez jelzi azt, hogy egy 24 bit-es blokk továbbítása megtörtént.
-
-\noindent Az egyes bit-ek átvitele a következőképp történik:
-
-\begin{itemize}
-\item Logikai 1-es
-	\begin{itemize}
-	\item \SI{0.8}{\micro\second}-ot magas feszűltségen
-	\item \SI{0.45}{\micro\second}-ot alacson feszűltségen
-	\end{itemize}
-\item Logikai 0-ás
-	\begin{itemize}
-	\item \SI{0.4}{\micro\second}-ot magas feszűltségen
-	\item \SI{0.85}{\micro\second}-ot alacson feszűltségen
-	\end{itemize}
-\item 24 bit-es adatblokk küldése után: 
-	\begin{itemize}
-		\item $ > \SI{50}{\micro\second}$-ot alacsony feszűltségen
-	\end{itemize}
-\end{itemize}
-
-\noindent A bit-ek továbbításánál egy +/- \SI{150}{\nano\second}-os eltérés megengedett.
-
-A várakozási értékeket nem az adatlapból, hanem az \href{https://learn.adafruit.com/adafruit-neopixel-uberguide}{alábbi} útmutatóból vettem. Az útmutató szerint az adatlapban levő értékek rosszul vannak kiszámolva.
-
-Egyelőre megpróbálok az útmutatóban megadott értékekkel dolgozni. Ha ez nem megfelelő működéshez vezet, akkor veszem az adatlapban levő értékeket.
 
 \subsection{Idődiagram}
 
