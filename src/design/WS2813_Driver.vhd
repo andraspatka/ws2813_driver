@@ -20,10 +20,8 @@
 -- 
 -- Revision:
 -- Revision 0.01 - File Created
--- Additional Comments:
--- TODO:
---      rename file and entity to led_controll
---      finish bit sending logic
+-- Revision 0.02 - Logic implemented
+-- Revision 0.03 - Tidied up the implementation, followed Finite Automata with data path pattern.
 -- 
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -48,13 +46,6 @@ architecture Behavioral of WS2813_Driver is
     constant T1L  : integer := 45;
     constant TRES : integer := 5000;
     
-    --Values for debugging
-    --constant T0H  : integer := 4;
-    --constant T0L  : integer := 8;
-    --constant T1H  : integer := 8;
-    --constant T1L  : integer := 4;
-    --constant TRES : integer := 10;
-    
     type state_type is (
         READY,
         INIT,
@@ -71,6 +62,7 @@ architecture Behavioral of WS2813_Driver is
         SEND0L,
         -- bit_count == 24?
         SHIFT_CHECK,
+        SHIFT,
         -- latching
         SENDRES_INIT,
         SENDRES,
@@ -79,9 +71,9 @@ architecture Behavioral of WS2813_Driver is
         DONE_TODO -- TODO: rename this
     );
     signal current_state, next_state: state_type;
-    signal bit_count : integer range 0 to 23;
-    signal i : integer range 0 to 5100;
-    signal r_data : std_logic_vector(23 downto 0);
+    signal Rbit_count, Rbit_count_next : integer range 0 to 23;
+    signal Ri, Ri_next : integer range 0 to 5100;
+    signal Rdata, Rdata_next: std_logic_vector(23 downto 0);
     
 begin
     --State register
@@ -95,22 +87,19 @@ begin
     end process;
     
     -- Next State Logic Register
-    NSR: process(current_state, start, i, clk_100)
+    NSR: process(current_state, start, Ri, Rbit_count, Rdata)
     begin
         case current_state is
             when READY =>
-                done <= '0';
                 if start = '1' then
                     next_state <= INIT;
                 else
                     next_state <= READY;
                 end if;
             when INIT =>
-                bit_count <= 0;
-                r_data <= data;
                 next_state <= SEND_IF01;
             when SEND_IF01 =>
-                if r_data(23) = '1' then
+                if Rdata(23) = '1' then
                     next_state <= SEND1H_INIT;
                 else
                     next_state <= SEND0H_INIT;
@@ -118,28 +107,18 @@ begin
             -- Sending '1'
             -- Sending 1H
             when SEND1H_INIT =>
-                i <= T1H;
-                d_out <= '1';
                 next_state <= SEND1H;
             when SEND1H =>
-                if (clk_100'event and clk_100 = '1') then
-                    i <= i - 1;
-                end if;
-                if i = 0 then
+                if Ri = 0 then
                     next_state <= SEND1L_INIT;
                 else
                     next_state <= SEND1H;
                 end if;
             -- Sending 1L
             when SEND1L_INIT =>
-                i <= T1L;
-                d_out <= '0';
                 next_state <= SEND1L;
-            when SEND1L => -- TODO: refactor into function
-                if (clk_100'event and clk_100 = '1') then
-                    i <= i - 1;
-                end if;
-                if i = 0 then
+            when SEND1L =>
+                if Ri = 0 then
                     next_state <= SHIFT_CHECK;
                 else
                     next_state <= SEND1L;
@@ -147,63 +126,107 @@ begin
             -- Sending '0'
             -- Sending 0H
             when SEND0H_INIT =>
-                i <= T0H;
-                d_out <= '1';
                 next_state <= SEND0H;
             when SEND0H =>
-                if (clk_100'event and clk_100 = '1') then
-                    i <= i - 1;
-                end if;
-                if i = 0 then
+                if Ri = 0 then
                     next_state <= SEND0L_INIT;
                 else
                     next_state <= SEND0H;
                 end if;
             when SEND0L_INIT =>
-                i <= T0L;
-                d_out <= '0';
                 next_state <= SEND0L;
             when SEND0L =>
-                if (clk_100'event and clk_100 = '1') then
-                    i <= i - 1;
-                end if;
-                if i = 0 then
+                if Ri = 0 then
                     next_state <= SHIFT_CHECK;
                 else
                     next_state <= SEND0L;
                 end if;
             -- Shift check
             when SHIFT_CHECK =>
-                if bit_count = 24 then
+                if Rbit_count = 24 then
                     next_state <= SENDRES_INIT;
                 else
-                    bit_count <= bit_count + 1;
-                    r_data <= std_logic_vector(shift_left(unsigned(r_data), 1));
-                    next_state <= SEND_IF01;
+                    next_state <= SHIFT;
                 end if;
+            when SHIFT =>
+                next_state <= SEND_IF01;
             -- Latching
             when SENDRES_INIT =>
-                i <= TRES;
-                d_out <= '0';
+                next_state <= SENDRES;
             when SENDRES =>
-                if (clk_100'event and clk_100 = '1') then
-                    i <= i - 1;
-                end if;
-                if i = 0 then
+                if Ri = 0 then
                     next_state <= SEND_DONE;
                 else
                     next_state <= SENDRES;
                 end if;
             when SEND_DONE =>
-                done <= '1';
                 next_state <= SEND_DONE;
-            when DONE_TODO =>
-                next_state <= DONE_TODO;
             when others =>
                 next_state <= current_state;
         end case;        
     end process;
     
+    --Multiplexers
+    with current_state select
+        Ri_next <= 0 when READY,
+                   T1H when SEND1H_INIT,
+                   Ri - 1 when SEND1H,
+                   T1L when SEND1L_INIT,
+                   Ri - 1 when SEND1L,
+                   T0H when SEND0H_INIT,
+                   Ri - 1 when SEND0H,
+                   T0L when SEND0L_INIT,
+                   Ri - 1 when SEND0L,
+                   TRES when SENDRES_INIT,
+                   Ri - 1 when SENDRES,
+                   Ri when others;
     
+    with current_state select
+        Rbit_count_next <= 0 when INIT,
+                           Rbit_count + 1 when SHIFT_CHECK,
+                           Rbit_count when others;
+        
+    with current_state select
+        Rdata_next <= data when INIT,
+                      std_logic_vector(shift_left(unsigned(Rdata), 1)) when SHIFT,
+                      Rdata when others;
+    
+    with current_state select
+        done <= '0' when READY,
+                '1' when SEND_DONE,
+                '0' when others;
+            
+    with current_state select
+        d_out <= '0' when READY,
+                 '1' when SEND1H,
+                 '0' when SEND1L,
+                 '1' when SEND0H,
+                 '0' when SEND0L,
+                 '0' when SENDRES,
+                 '0' when others;
+            
+    --For the index register
+    DATA_Ri : process(clk_100, reset)
+    begin
+        if clk_100'event and clk_100 = '1' then
+            Ri <= Ri_next;
+        end if;
+    end process DATA_Ri;
+    
+    --For the data register
+    DATA_Rdata : process(clk_100, reset)
+    begin
+        if clk_100'event and clk_100 = '1' then
+            Rdata <= Rdata_next;
+        end if;
+    end process DATA_Rdata;
+    
+    --For the bit_count register
+    DATA_Rbit_count : process(clk_100, reset)
+    begin
+        if clk_100'event and clk_100 = '1' then
+            Rbit_count <= Rbit_count_next;
+        end if;
+    end process DATA_Rbit_count;
     
 end Behavioral;
