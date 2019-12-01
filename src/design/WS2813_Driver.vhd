@@ -4,6 +4,7 @@
 -- 
 -- Create Date: 11/07/2019 08:02:14 PM
 -- Project Name: Led fuzer vezerlese
+-- Target Devices: Basys3 FPGA
 -- Module Name: WS2813_Driver - Behavioral
 -- Description: 
 --      Module capable of driving a WS2813 LED strip
@@ -16,12 +17,11 @@
 --      T1L = 0.45 us => 100 Mhz 45 cycle
 --      TRES = > 50 us => 100 Mhz >5000 cycle
 -- 
--- Dependencies: 
--- 
 -- Revision:
 -- Revision 0.01 - File Created
 -- Revision 0.02 - Logic implemented
 -- Revision 0.03 - Tidied up the implementation, followed Finite Automata with data path pattern.
+-- Revision 0.04 - Bit_count is now counted downwards and compared to 0.
 -- 
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -143,7 +143,7 @@ begin
                 end if;
             -- Shift check
             when SHIFT_CHECK =>
-                if Rbit_count = 24 then
+                if Rbit_count = 0 then
                     next_state <= SENDRES_INIT;
                 else
                     next_state <= SHIFT;
@@ -182,8 +182,8 @@ begin
                    Ri when others;
     
     with current_state select
-        Rbit_count_next <= 0 when INIT,
-                           Rbit_count + 1 when SHIFT_CHECK,
+        Rbit_count_next <= 23 when INIT,
+                           Rbit_count - 1 when SHIFT_CHECK,
                            Rbit_count when others;
         
     with current_state select

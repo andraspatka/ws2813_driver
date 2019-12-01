@@ -79,6 +79,7 @@ begin
     start <= '0';
     
     wait on done;
+    wait for 40 ns;
     
 end process;
 

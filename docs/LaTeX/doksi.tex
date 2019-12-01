@@ -187,7 +187,8 @@ Ebből már látható, hogy definiálható két művelet: $i \Leftarrow ciklus\_
 Tehát minden bit kiküldése után ennek a regiszternek az értékeit el kell csúsztatni (shift-elni) egyet balra: $data \Leftarrow data << 1$
 
 \indent Egy 24-bites blokk kiküldése után kell küldeni egy "RES" jelet, vagyis több ideig alacsony feszűltségen kell tartani a kimenetet. 
-Ehhez számolni kell a már elküldött bitek számát $bit\_count \Leftarrow bit\_count + 1$, ahol bit\_count az eddig elküldött bitek számát tartalmazza.
+Ehhez számolni kell a már elküldött bitek számát $bit\_count \Leftarrow bit\_count - 1$, ahol bit\_count az eddig elküldött bitek számát tartalmazza.
+Az elküldött bit-ek 23-től számolódnak lefele, mivel a nullához való hasonlítás hatékonyabb, mint egy adott értékhez való hasonlítás.
 
 \subsubsection{Adatfüggőségek identifikálása}
 
@@ -199,7 +200,7 @@ Szükséges regiszterek:
 \begin{itemize}
 	\item $R_i$: ciklusszámláló regiszter a késleltetésekhez.
 	\item $R_{bit}$\_count: Biteket számláló regiszter, a 24 bit-es blokk elküldésének érzékeléséhez.
-	\item $R_{data}$: Elkündendő adatot tartalmazó regiszter
+	\item $R_{data}$: Elküldendő adatot tartalmazó regiszter
 \end{itemize}
 
 \subsubsection{Különböző fázisokban elvégzendő műveletek}
@@ -212,7 +213,7 @@ Szükséges regiszterek:
 		\hline         
 		READY            & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & 'U' 	 & '0' \\
 		\hline         
-		INIT          	 & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & 'U' 	 & $done$ \\
+		INIT          	 & $R_i$ 	 & $24$			        & data      	  & 'U' 	 & $done$ \\
 		\hline         
 		SEND\_IF01       & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & 'U' 	 & $done$ \\
 		\hline         
@@ -232,7 +233,9 @@ Szükséges regiszterek:
 		\hline         
 		SEND0L           & $R_i - 1$ & $R_{bit\_count}$     & $R_{data}$      & $d\_out$ & $done$ \\
 		\hline
-		SHIFT\_CHECK     & $R_i$     & $R_{bit\_count} + 1$ & $R_{data} << 1$ & $d\_out$ & $done$ \\
+		SHIFT\_CHECK     & $R_i$     & $R_{bit\_count} - 1$ & $R_{data}$      & $d\_out$ & $done$ \\
+		\hline
+		SHIFT	         & $R_i$     & $R_{bit\_count}$     & $R_{data} << 1$ & $d\_out$ & $done$ \\
 		\hline
 		SENDRES\_INIT    & $TRES$    & $R_{bit\_count}$     & $R_{data}$      & '0'      & $done$ \\
 		\hline
@@ -345,8 +348,12 @@ Végleges állapotdiagram, az implementációban is használt.
 	\end{itemize}
 \item SHIFT\_CHECK
 	\begin{itemize}
-	\item Megnézi, hogy a \textbf{bit\_count} változó 24-e, ha igen, akkor tovább megy a \textbf{SENDRES\_INIT} állapotra
-	\item Ha a \textbf{bit\_count} változó nem egyenlő 24-el, akkor shift-eli a \textbf{data} std logic vectort balra eggyel; vissza megy a \textbf{SEND\_IF01} állapotra
+	\item Megnézi, hogy a \textbf{bit\_count} változó nulla-e, ha igen, akkor tovább megy a \textbf{SENDRES\_INIT} állapotra
+	\item Ha a \textbf{bit\_count} változó nem egyenlő nullával, akkor tovább megy a \textbf{SHIFT} állapotra
+	\end{itemize}
+\item SHIFT
+	\begin{itemize}
+	\item Shift-eli a \textbf{data} std logic vectort balra eggyel; vissza megy a \textbf{SEND\_IF01} állapotra
 	\end{itemize}
 \item SENDRES\_INIT
 	\begin{itemize}
