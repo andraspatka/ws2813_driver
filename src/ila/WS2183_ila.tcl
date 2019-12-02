@@ -1,8 +1,8 @@
 
 #TCL parancsokat alkalamzva  terv a követekzõképpen hozható létre
 
-set terv_nev teszt_8
-set konyvtar D:/Diak/Patka/mukodes_kozbeni_teszteles
+set terv_nev led_ila
+set konyvtar D:/Diak/Patka/led_fuzer_mukodes_kozbeni
 start_gui
 create_project ${terv_nev} ${konyvtar}/${terv_nev} -part xc7z010clg400-1
 
@@ -11,7 +11,7 @@ create_project ${terv_nev} ${konyvtar}/${terv_nev} -part xc7z010clg400-1
 #VHDL hardver leíró nyelv beállítása
 set_property target_language VHDL [current_project]
 #VHDL forráskódnak a tervhez való csatolása
-add_files -norecurse ${konyvtar}/top_level_2.vhd
+add_files -norecurse ${konyvtar}/WS2813_Driver.vhd
 
 #Megkötés állománynak a tervhez valócsatolása
 add_files -fileset constrs_1 -norecurse ${konyvtar}/system_4.xdc
@@ -43,20 +43,20 @@ set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
 set_property port_width 1 [get_debug_ports u_ila_0/clk]
 
 #ILA modul órajelének meghatározása
-connect_debug_port u_ila_0/clk [get_nets [list src_clk_IBUF_BUFG]]
-#A Tesy modulon probe0 sínszélességének meghatározása
-set_property port_width 3 [get_debug_ports u_ila_0/probe0]
-#probe0 bemenetre a start, reset és q_div jelek csatolása. 
+connect_debug_port u_ila_0/clk [get_nets [list clk_100_IBUF_BUFG]]
+#A Test modulon probe0 sínszélességének meghatározása
+set_property port_width 2 [get_debug_ports u_ila_0/probe0]
+#probe0 bemenetre a start, reset és d_out jelek csatolása. 
 #a forráskodban meghatározott jelek nem érhetõek el tesztelésre a szintézist követõen, hanem a 
 #bemenetek esetében start_IBUF reset_IBUF, kimenetek esetében pedig _OBUF
-connect_debug_port u_ila_0/probe0 [get_nets [list start_IBUF reset_IBUF q_div]]
+connect_debug_port u_ila_0/probe0 [get_nets [list start_IBUF reset_IBUF]]
 
-#egy újabb bemenet (probe1) létrehozása a tesztemodul bemenetére
+#egy újabb bemenet (probe1) létrehozása a tesztmodul bemenetére
 create_debug_port u_ila_0 probe
 #sínszélesség beállítása
-set_property port_width 4 [get_debug_ports u_ila_0/probe1]
+set_property port_width 2 [get_debug_ports u_ila_0/probe1]
 #q_OBUF[0], q_OBUF[1], q_OBUF[2], q_OBUF[3]  kiemeneteknek a probe1 bemeneti portra való csatolása
-connect_debug_port u_ila_0/probe1 [get_nets [list q_O*]]
+connect_debug_port u_ila_0/probe1 [get_nets [list d_out done]]
 
 #Megkötés fájl mentése
 save_constraints_as system_${terv_nev}.xdc
