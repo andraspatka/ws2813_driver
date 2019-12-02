@@ -1,98 +1,90 @@
+# TCL script of the setup of ILA testing of WS2813_Driver.vhd
 
-#TCL parancsokat alkalamzva  terv a követekzõképpen hozható létre
-
-set terv_nev led_ila
-set konyvtar D:/Diak/Patka/led_fuzer_mukodes_kozbeni
+set design_name ws2813_ila
+set directory .
 start_gui
-create_project ${terv_nev} ${konyvtar}/${terv_nev} -part xc7z010clg400-1
+create_project ${design_name} ${directory}/${design_name} -part xc7a35tcpg236-1
 
-#check_ip_cache -clear_output_repo
-
-#VHDL hardver leíró nyelv beállítása
+# Set target language to VHDL 
 set_property target_language VHDL [current_project]
-#VHDL forráskódnak a tervhez való csatolása
-add_files -norecurse ${konyvtar}/WS2813_Driver.vhd
+# Add vhdl file
+add_files -norecurse ${directory}/WS2813_Driver.vhd
 
-#Megkötés állománynak a tervhez valócsatolása
-add_files -fileset constrs_1 -norecurse ${konyvtar}/system_4.xdc
+# Add constraint file
+add_files -fileset constrs_1 -norecurse ${directory}/WS2183_ila.xdc
 update_compile_order -fileset sources_1
 update_compile_order -fileset sim_1
 
-#Szintézis futtatása
+# Launch the synthesis and wait until it's finished
 launch_runs synth_1
-#Várakozás a szintézis befejezésére
 wait_on_run synth_1
 
-#Synthesized Design megnyitása
+# Open the synthesized design
 open_run synth_1
 
-#Debug core magnak a tervhez való csatolása
+# Add the Debug core to the design
 create_debug_core u_ila_0 ila
 
-#ILA modul konfigurálása
+#ILA modul konfigurï¿½lï¿½sa
 set_property C_DATA_DEPTH 65536 [get_debug_cores u_ila_0]
 set_property C_TRIGIN_EN true [get_debug_cores u_ila_0]
 set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
-#enable advanced trigger mode
+# enable advanced trigger mode
 set_property C_ADV_TRIGGER true [get_debug_cores u_ila_0]
 set_property C_INPUT_PIPE_STAGES 0 [get_debug_cores u_ila_0]
-#enable Basic capture mode
+# enable Basic capture mode
 set_property C_EN_STRG_QUAL false [get_debug_cores u_ila_0]
 set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
 set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
 set_property port_width 1 [get_debug_ports u_ila_0/clk]
 
-#ILA modul órajelének meghatározása
+# Defining the clock for ILA module
 connect_debug_port u_ila_0/clk [get_nets [list clk_100_IBUF_BUFG]]
-#A Test modulon probe0 sínszélességének meghatározása
+# A Test modulon probe0 sï¿½nszï¿½lessï¿½gï¿½nek meghatï¿½rozï¿½sa
 set_property port_width 2 [get_debug_ports u_ila_0/probe0]
-#probe0 bemenetre a start, reset és d_out jelek csatolása. 
-#a forráskodban meghatározott jelek nem érhetõek el tesztelésre a szintézist követõen, hanem a 
-#bemenetek esetében start_IBUF reset_IBUF, kimenetek esetében pedig _OBUF
+#probe0 bemenetre a start, reset ï¿½s d_out jelek csatolï¿½sa. 
+#a forrï¿½skodban meghatï¿½rozott jelek nem ï¿½rhetï¿½ek el tesztelï¿½sre a szintï¿½zist kï¿½vetï¿½en, hanem a 
+#bemenetek esetï¿½ben start_IBUF reset_IBUF, kimenetek esetï¿½ben pedig _OBUF
 connect_debug_port u_ila_0/probe0 [get_nets [list start_IBUF reset_IBUF]]
 
-#egy újabb bemenet (probe1) létrehozása a tesztmodul bemenetére
+# Creating another input (probe1) to the test module's input
 create_debug_port u_ila_0 probe
-#sínszélesség beállítása
+# Set bus width
 set_property port_width 2 [get_debug_ports u_ila_0/probe1]
-#q_OBUF[0], q_OBUF[1], q_OBUF[2], q_OBUF[3]  kiemeneteknek a probe1 bemeneti portra való csatolása
-connect_debug_port u_ila_0/probe1 [get_nets [list d_out done]]
+# set d_out and done outputs to probe input
+connect_debug_port u_ila_0/probe1 [get_nets [list d_out_OBUF done_OBUF]]
 
-#Megkötés fájl mentése
-save_constraints_as system_${terv_nev}.xdc
+# Saving the debug constraint file
+save_constraints_as system_${design_name}.xdc
 
-set_property constrset system_${terv_nev}.xdc [get_runs synth_1]
-set_property constrset system_${terv_nev}.xdc [get_runs impl_1]
-#save_constraints
+set_property constrset system_${design_name}.xdc [get_runs synth_1]
+set_property constrset system_${design_name}.xdc [get_runs impl_1]
 
-#check_ip_cache -clear_output_repo
-
-#Implementáció lefuttatása
+# Launching the implementation
 launch_runs impl_1
 wait_on_run impl_1
 
-#Konfigurációs fájl generálása
-launch_runs impl_1 -to_step write_bitstream
+# Generating the configuration file
+launch_runs impl_1 -to_step write_bitstream -verbose -force ${directory}/${design_name}/${design_name}.runs/impl_1/WS2813_Driver.bit
 wait_on_run impl_1
 
-#Hardver megnyitása
+# Opening the hardware
 open_hw
 
-#szerver indítása az FPGA áramkörre való kapcsolódás céljábók
+# Starting the server to connect to the FPGA
 connect_hw_server
-#Célhardver megnyitása 
+# Openning the target hardware
 open_hw_target
 
-#Konfigurios .bit fájl és debug_net.ltx beállítása
-set_property PROGRAM.FILE ${konyvtar}/${terv_nev}/${terv_nev}.runs/impl_1/top_level_2.bit [lindex [get_hw_devices] 1]
-set_property PROBES.FILE ${konyvtar}/${terv_nev}/${terv_nev}.runs/impl_1/debug_nets.ltx [lindex [get_hw_devices] 1]
-
+# Setting the configuration bit file
+set_property PROGRAM.FILE ${directory}/${design_name}/${design_name}.runs/impl_1/WS2813_Driver.bit [lindex [get_hw_devices] 1]
+set_property PROBES.FILE ${directory}/${design_name}/${design_name}.runs/impl_1/debug_nets.ltx [lindex [get_hw_devices] 1]
 
 current_hw_device [lindex [get_hw_devices] 1]
-#hardver frisítése
+# Refreshing the hardware device
 refresh_hw_device [lindex [get_hw_devices] 1]
 
-#hardver programozása
+# Programming the hardware device
 program_hw_devices [lindex [get_hw_devices] 1]
 
 refresh_hw_device [lindex [get_hw_devices] 1]

@@ -60,7 +60,7 @@ architecture Behavioral of WS2813_Driver is
         SEND0H,
         SEND0L_INIT,
         SEND0L,
-        -- bit_count == 24?
+        -- bit_count == 0?
         SHIFT_CHECK,
         SHIFT,
         -- latching
