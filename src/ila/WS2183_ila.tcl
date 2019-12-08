@@ -25,7 +25,7 @@ open_run synth_1
 # Add the Debug core to the design
 create_debug_core u_ila_0 ila
 
-#ILA modul konfigur�l�sa
+#Configuring the ILA module
 set_property C_DATA_DEPTH 65536 [get_debug_cores u_ila_0]
 set_property C_TRIGIN_EN true [get_debug_cores u_ila_0]
 set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
@@ -40,11 +40,9 @@ set_property port_width 1 [get_debug_ports u_ila_0/clk]
 
 # Defining the clock for ILA module
 connect_debug_port u_ila_0/clk [get_nets [list clk_100_IBUF_BUFG]]
-# A Test modulon probe0 s�nsz�less�g�nek meghat�roz�sa
+# Defining the probe's bus width
 set_property port_width 2 [get_debug_ports u_ila_0/probe0]
-#probe0 bemenetre a start, reset �s d_out jelek csatol�sa. 
-#a forr�skodban meghat�rozott jelek nem �rhet�ek el tesztel�sre a szint�zist k�vet�en, hanem a 
-#bemenetek eset�ben start_IBUF reset_IBUF, kimenetek eset�ben pedig _OBUF
+# _IBUF suffix for input, _OBUF suffix for output
 connect_debug_port u_ila_0/probe0 [get_nets [list start_IBUF reset_IBUF]]
 
 # Creating another input (probe1) to the test module's input
@@ -65,7 +63,7 @@ launch_runs impl_1
 wait_on_run impl_1
 
 # Generating the configuration file
-launch_runs impl_1 -to_step write_bitstream -verbose -force ${directory}/${design_name}/${design_name}.runs/impl_1/WS2813_Driver.bit
+launch_runs impl_1 -to_step write_bitstream
 wait_on_run impl_1
 
 # Opening the hardware
