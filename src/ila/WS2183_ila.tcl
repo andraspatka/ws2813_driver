@@ -1,7 +1,7 @@
 # TCL script of the setup of ILA testing of WS2813_Driver.vhd
 
 set design_name ws2813_ila
-set directory .
+set directory D:/Diak/Patka/github/fpga_project/src/ila
 start_gui
 create_project ${design_name} ${directory}/${design_name} -part xc7a35tcpg236-1
 

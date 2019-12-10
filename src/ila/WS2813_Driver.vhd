@@ -35,7 +35,7 @@ entity WS2813_Driver is
         clk_100 : in std_logic; --100MHz clock
         start   : in std_logic;
         reset   : in std_logic;
-        data    : in std_logic_vector(23 downto 0);
+        data    : in std_logic_vector(3 downto 0);
         d_out   : out std_logic;
         done    : out std_logic
     );
@@ -73,9 +73,9 @@ architecture Behavioral of WS2813_Driver is
         DONE_TODO -- TODO: rename this
     );
     signal current_state, next_state: state_type;
-    signal Rbit_count, Rbit_count_next : integer range 0 to 23;
+    signal Rbit_count, Rbit_count_next : integer range 0 to 3;
     signal Ri, Ri_next : integer range 0 to 5100;
-    signal Rdata, Rdata_next: std_logic_vector(23 downto 0);
+    signal Rdata, Rdata_next: std_logic_vector(3 downto 0);
     
 begin
     --State register
@@ -101,7 +101,7 @@ begin
             when INIT =>
                 next_state <= SEND_IF01;
             when SEND_IF01 =>
-                if Rdata(23) = '1' then
+                if Rdata(3) = '1' then
                     next_state <= SEND1H_INIT;
                 else
                     next_state <= SEND0H_INIT;
@@ -184,7 +184,7 @@ begin
                    Ri when others;
     
     with current_state select
-        Rbit_count_next <= 23 when INIT,
+        Rbit_count_next <= 3 when INIT,
                            Rbit_count - 1 when SHIFT_CHECK,
                            Rbit_count when others;
         

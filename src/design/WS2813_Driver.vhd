@@ -11,10 +11,10 @@
 --      Sends ONE 24 bit block to the WS2813 LED strip
 --      100 MHz clk signal = 0.01 us
 --      Bit transfer timings:
---      T0H = 0.40 us => 100 Mhz 40 cycle
---      T0L = 0.85 us => 100 Mhz 85 cycle
---      T1H = 0.80 us => 100 Mhz 80 cycle
---      T1L = 0.45 us => 100 Mhz 45 cycle
+--      T0H = 0.40 us => 100 Mhz 40 cycle -> 39
+--      T0L = 0.85 us => 100 Mhz 85 cycle -> 79
+--      T1H = 0.80 us => 100 Mhz 80 cycle -> 79
+--      T1L = 0.45 us => 100 Mhz 45 cycle -> 39
 --      TRES = > 50 us => 100 Mhz >5000 cycle
 -- 
 -- Revision:
@@ -22,6 +22,8 @@
 -- Revision 0.02 - Logic implemented
 -- Revision 0.03 - Tidied up the implementation, followed Finite Automata with data path pattern.
 -- Revision 0.04 - Bit_count is now counted downwards and compared to 0.
+-- Revision 0.05 - During simulation it was observed that the timings were not exactly correct
+--                 The T0H, T0L, T1H, T0H values were updated to address this.
 -- 
 ----------------------------------------------------------------------------------
 library IEEE;
@@ -40,10 +42,10 @@ entity WS2813_Driver is
 end WS2813_Driver;
 
 architecture Behavioral of WS2813_Driver is
-    constant T0H  : integer := 40;
-    constant T0L  : integer := 85;
-    constant T1H  : integer := 80;
-    constant T1L  : integer := 45;
+    constant T0H  : integer := 39;
+    constant T0L  : integer := 79;
+    constant T1H  : integer := 79;
+    constant T1L  : integer := 39;
     constant TRES : integer := 5000;
     
     type state_type is (
