@@ -1,7 +1,7 @@
 # TCL script of the setup of ILA testing of WS2813_Driver.vhd
 
 set design_name ws2813_ila
-set directory D:/Diak/Patka/github/fpga_project/src/ila
+set directory C:/Informatika/fpga/terv/src/ila
 start_gui
 create_project ${design_name} ${directory}/${design_name} -part xc7a35tcpg236-1
 
@@ -41,9 +41,9 @@ set_property port_width 1 [get_debug_ports u_ila_0/clk]
 # Defining the clock for ILA module
 connect_debug_port u_ila_0/clk [get_nets [list clk_100_IBUF_BUFG]]
 # Defining the probe's bus width
-set_property port_width 2 [get_debug_ports u_ila_0/probe0]
+set_property port_width 3 [get_debug_ports u_ila_0/probe0]
 # _IBUF suffix for input, _OBUF suffix for output
-connect_debug_port u_ila_0/probe0 [get_nets [list start_IBUF reset_IBUF]]
+connect_debug_port u_ila_0/probe0 [get_nets [list start_IBUF reset_IBUF clk_100_IBUF]]
 
 # Creating another input (probe1) to the test module's input
 create_debug_port u_ila_0 probe
@@ -51,6 +51,16 @@ create_debug_port u_ila_0 probe
 set_property port_width 2 [get_debug_ports u_ila_0/probe1]
 # set d_out and done outputs to probe input
 connect_debug_port u_ila_0/probe1 [get_nets [list d_out_OBUF done_OBUF]]
+
+# Creating another input (probe2) to the test module's input
+create_debug_port u_ila_0 probe
+# Set bus width
+set_property port_width 4 [get_debug_ports u_ila_0/probe2]
+# set the four bits of data
+connect_debug_port u_ila_0/probe2 [get_nets [list {data_IBUF[0]} {data_IBUF[1]} {data_IBUF[2]} {data_IBUF[3]}]]
+
+
+
 
 # Saving the debug constraint file
 save_constraints_as system_${design_name}.xdc
@@ -75,14 +85,17 @@ connect_hw_server
 open_hw_target
 
 # Setting the configuration bit file
-set_property PROGRAM.FILE ${directory}/${design_name}/${design_name}.runs/impl_1/WS2813_Driver.bit [lindex [get_hw_devices] 1]
-set_property PROBES.FILE ${directory}/${design_name}/${design_name}.runs/impl_1/debug_nets.ltx [lindex [get_hw_devices] 1]
+set_property PROGRAM.FILE ${directory}/${design_name}/${design_name}.runs/impl_1/WS2813_Driver.bit [get_hw_devices xc7a35t_0]
+set_property PROBES.FILE ${directory}/${design_name}/${design_name}.runs/impl_1/debug_nets.ltx [get_hw_devices xc7a35t_0]
 
-current_hw_device [lindex [get_hw_devices] 1]
+current_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
 # Refreshing the hardware device
-refresh_hw_device [lindex [get_hw_devices] 1]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
 
 # Programming the hardware device
-program_hw_devices [lindex [get_hw_devices] 1]
+program_hw_devices [get_hw_devices xc7a35t_0]
 
-refresh_hw_device [lindex [get_hw_devices] 1]
+refresh_hw_device [lindex [get_hw_devices xc7a35t_0] 0]
+
+# create triggers
+set_property TRIGGER_COMPARE_VALUE eq1'b1 [get_hw_probes d_out_OBUF -of_objects [get_hw_ilas -of_objects [get_hw_devices xc7a35t_0] -filter {CELL_NAME=~"u_ila_0"}]]
