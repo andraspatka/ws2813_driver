@@ -55,8 +55,10 @@ BRAM_instance: blk_mem_gen_0
 process
 begin
     addra <= "0000";
-    wait for 5 ns;
+	ena <= '0';
+    wait for 20 ns;
     ena <= '1';
+	
     for i in 0 to 14 loop
         wait for 10 ns;
         addra <= addra + "1";
