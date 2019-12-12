@@ -5,3 +5,6 @@
 *.aux
 *.out
 *.dvi
+*.bbl
+*.toc
+*.blg

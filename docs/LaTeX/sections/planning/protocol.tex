@@ -1,0 +1,61 @@
+\tab A LED-eket vezérlő áramkörök egymás után vannak bekötve úgy, hogy az egyik áramkörnek az adatkimenete a következő áramkörnek az adatbemenetét képzi.
+Egyszálú az adatátvitel, fontos a protokoll betartása, ahhoz, hogy adatokat tudjanak megjelenni a LED-fűzéren.
+
+\tab Amikor egy áramkör megkap egy 24 bit-es kódot, akkor ezt addig tárolja amíg más kódot nem kap, vagy a tápforrást el nem veszti.
+
+\subsubsection{A 24 bit-es kód}
+
+\tab A 24 bit-es kód a következőképpen kell kinézzen: 
+
+\tab \textbf{8 bit GREEN} | \textbf{8 bit RED} | \textbf{8 bit BLUE}
+
+\tab Az adatátvitel a következő sorrendben kell történjen: 
+\begin{enumerate}
+\item GREEN
+\item RED
+\item BLUE
+\end{enumerate}
+
+\subsubsection{Bit-ek küldési sorrendje}
+
+\tab Az egyes byte-ok küldését úgy kell elvégezni, hogy az \textbf{MSB}-vel kell kezdeni és haladni az \textbf{LSB} fele. 
+24 bit-es kód részletesebb felbontása: 
+\begin{itemize}
+\item \textit{G7 G6 G5 G4 G3 G2 G1 G0 | R7 R6 R5 R4 R3 R2 R1 R0 | B7 B6 B5 B4 B3 B2 B1 B0}
+\end{itemize}
+
+\tab A küldés a következő sorrendben kell elvégződjön (balról jobbra): 
+\begin{itemize}
+\item \textbf{G7 G6 G5 G4 G3 G2 G1 G0 | R7 R6 R5 R4 R3 R2 R1 R0 | B7 B6 B5 B4 B3 B2 B1 B0}
+\end{itemize}
+
+\subsubsection{Időzítések}
+
+\tab Minden 24 bit-es adatátvitel után kell legalább \SI{50}{\micro\second}-ot várakozni, alacsony feszűltségen. Ez jelzi azt, hogy egy 24 bit-es blokk továbbítása megtörtént.
+
+\tab Az egyes bit-ek átvitele a következőképp történik:
+
+\begin{itemize}
+\item Logikai 1-es
+	\begin{itemize}
+	\item \SI{0.8}{\micro\second}-ot magas feszűltségen
+	\item \SI{0.45}{\micro\second}-ot alacson feszűltségen
+	\end{itemize}
+\item Logikai 0-ás
+	\begin{itemize}
+	\item \SI{0.4}{\micro\second}-ot magas feszűltségen
+	\item \SI{0.85}{\micro\second}-ot alacson feszűltségen
+	\end{itemize}
+\item 24 bit-es adatblokk küldése után: 
+	\begin{itemize}
+		\item $ > \SI{50}{\micro\second}$-ot alacsony feszűltségen
+	\end{itemize}
+\end{itemize}
+
+\tab A bit-ek továbbításánál egy +/- \SI{150}{\nano\second}-os eltérés megengedett.
+
+\tab A várakozási értékek nem az adatlapból, hanem az \href{https://learn.adafruit.com/adafruit-neopixel-uberguide}{alábbi} útmutatóból lettek kivéve. 
+Az útmutató szerint az adatlapban levő értékek rosszul vannak kiszámolva.
+
+\tab Ha az útmutatóban megadott értékek nem megfelelő működéshez vezetnek, akkor az adatlapban levő értékek lesznek felhasználva. 
+Ez a valós rendszeren levő tesztelés közben fog kiderülni.

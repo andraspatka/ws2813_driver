@@ -1,0 +1,36 @@
+Ez a modul felelős egy 24 bit-es blokk kiküldéséért 
+
+
+\subsubsection{Elvégezendő RT műveletek azonosítása}
+
+Az időzítések implementálásához egy számláló lesz használva. A 100 MHz-es órajel ami fel lesz használva időben $\SI{0.01}{\micro\second}$-nak felel meg. 
+Így a szükséges ciklusok száma (amennyit várakoztatni kell bizonyos feszűltségszinten, ahhoz, hogy a WS2813 protokollja be legyen tartva) egész.
+Ebből már látható, hogy definiálható két művelet: $i \Leftarrow ciklus\_szam$, $i \Leftarrow i - 1$ (ahol i a számláló).
+
+\indent Az egyszerűség kedvéért, egy belső regiszternek, amely a színadatokat tartalmazza (\textbf{data}), mindig a 24. bitje kerül kiküldésre.
+Tehát minden bit kiküldése után ennek a regiszternek az értékeit el kell csúsztatni (shift-elni) egyet balra: $data \Leftarrow data << 1$
+
+\indent Egy 24-bites blokk kiküldése után kell küldeni egy "RES" jelet, vagyis több ideig alacsony feszűltségen kell tartani a kimenetet. 
+Ehhez számolni kell a már elküldött bitek számát $bit\_count \Leftarrow bit\_count - 1$, ahol bit\_count az eddig elküldött bitek számát tartalmazza.
+Az elküldött bit-ek 23-től számolódnak lefele, mivel a nullához való hasonlítás hatékonyabb, mint egy adott értékhez való hasonlítás.
+
+\subsubsection{Adatfüggőségek identifikálása}
+
+Mivel nagyon egyszerű RT műveletekkel meg lehet oldani az adott feladatot, nem merűlnek fel adatfüggőségek.
+
+\subsubsection{Célregiszterek azonosítása}
+
+Szükséges regiszterek:
+\begin{itemize}
+	\item $R_i$: ciklusszámláló regiszter a késleltetésekhez.
+	\item $R_{bit}$\_count: Biteket számláló regiszter, a 24 bit-es blokk elküldésének érzékeléséhez.
+	\item $R_{data}$: Elküldendő adatot tartalmazó regiszter
+\end{itemize}
+
+\subsubsection{Különböző fázisokban elvégzendő műveletek}
+
+\input{tables/driver}
+
+\subsubsection{Kapcsolási rajz}
+
+TODO

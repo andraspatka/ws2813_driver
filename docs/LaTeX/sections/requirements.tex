@@ -1,0 +1,34 @@
+\subsection{Funkcionális követelmények}
+\begin{itemize}
+\item Lehetséges legyen egy reklámszöveget kiírni a ledfűzérek által létrehozott mátrix-ra.
+\item Egy sorban minimum 100 LED található
+\item Az egyes ledfűzérek szinkronba működjenek
+\item A kiírás párhuzamosan történik az adott ledfűzéreken
+\item Másodpercenként 60 frissítés (60 Hz)
+\item Mozgó szöveg
+\end{itemize}
+
+\subsection{Nem funkcionális követelmények}
+\begin{itemize}
+\item Benti használatra van tervezve
+\item Ha az FPGA-lapnak lesz készítve külön tokozat, akkor IP31-es standardnak kell megfeleljen
+\item Ha az FPGA-lapnak nem lesz készítve külön tokozat, akkor nem felel meg IP standardnak (IP00)
+\end{itemize}
+
+\subsection{Fejlesztési követelmények}
+\begin{itemize}
+\item Implementáció VHDL nyelvben
+\item Szimulációs állomány a rendszer tesztelésére
+\item Adatok kiírása lehetséges a LED fűzérre
+\item Modularitás
+\begin{itemize}
+	\item Külön modul egy 24 bit-es blokk küldésére (WS2813\_Driver)
+	\item Külön modul a WS2813\_Driver modul BRAM-al való összekötésére (Controller)
+	\item Top level modul a Controllerek összekötésére a BRAM-okkal
+\end{itemize}
+\item Opcionális: 
+\begin{itemize}
+	\item Pár betű kódolása (3-4)
+	\item Betük tárolása BRAM memóriában
+\end{itemize}
+\end{itemize}

@@ -1,0 +1,72 @@
+\subsection{WS2813\_Driver}
+
+A \textbf{WS2813\_Driver} modul szimulációja alatt a következőkre figyeltem:
+\begin{itemize}
+	\item WS2813 egyszálú protokollja be van-e tartva
+	\item A 24 bit-es blokkot sikerült-e legalább \SI{80}{\micro\second} alatt elküldeni (egy bitet elküldeni \SI{1.25}{\micro\second}, 24 bit-es blokk elküldése után min. \SI{50}{\micro\second}-ot kell várakozni) $1.25 * 24 + 50 = 80$ (\SI{}{\micro\second})
+	\item A küldés befejezése után a \textbf{done} jel 1-esre lett-e állítva
+\end{itemize}
+
+A szimuláció során észrevevődött, hogy már az első kritérium nem teljesül:
+
+\includegraphics[scale=0.4]{driver_0_hibas.PNG}
+
+Látható, hogy nullás küldése esetén a kimenet \SI{0.41}{\micro\second}-ot van magas feszűltésgen tartva \SI{0.45}{\micro\second} helyett és \SI{0.91}{\micro\second}-ot van
+alacsony feszűltségen tartva, \SI{0.85}{\micro\second} helyett.
+
+\includegraphics[scale=0.4]{driver_1_hibas.PNG}
+
+Itt látható, hogy egyes küldése esetén a kimenet \SI{0.81}{\micro\second}-ot van magas feszűltésgen tartva \SI{0.8}{\micro\second} helyett és \SI{0.51}{\micro\second}-ot van
+alacsony feszűltségen tartva, \SI{0.45}{\micro\second} helyett.
+
+Ezt egyszerűen meg lehet oldani a ciklusszámok módosítása által.
+
+Módosított ciklusszámok:
+
+\begin{itemize}
+\item Logikai 1-es
+	\begin{itemize}
+	\item 79 ciklus magas feszűltségen
+	\item 39 ciklus alacsony feszűltségen
+	\end{itemize}
+\item Logikai 0-ás
+	\begin{itemize}
+	\item 39 ciklus magas feszűltségen
+	\item 79 ciklus alacsony feszűltségen
+	\end{itemize}
+\end{itemize}
+
+A frissített értékekkel a WS2813 protokollja már pontosan be van tartva.
+
+Logikai egyesre:
+
+\includegraphics[scale=0.6]{driver_1_helyes.PNG}
+
+Logikai nullásra:
+
+\includegraphics[scale=0.6]{driver_0_helyes.PNG}
+
+A másik két követelmény is teljesül:
+
+\includegraphics[scale=0.4]{driver_done.PNG}
+
+A 24 bit-es blokk elküldése után a done jel egyesre lett állítva és \SI{80.04}{\micro\second} alatt sikerült az egész 24 bit-es blokkot elküldeni.
+
+
+\subsection{BRAM memória}
+
+A BRAM memóriának a használatát a következő két blogbejegyzés alapján tanultam meg: \href{http://vhdlguru.blogspot.com/2010/10/design-and-simulation-of-bram-using.html}{bram használata és tesztelése}
+és \href{https://vhdlguru.blogspot.com/2010/10/how-to-use-coe-file-for-initializing.html}{BRAM feltöltése coefficient file használata által}.
+A második blogbejegyzés alapján tanultam meg a BRAM memóriának a \textbf{coefficient} file alapján való feltöltését.
+A BRAM memória szimulációja alatt azt értem, hogy megvizsgálom, hogy a BRAM memória helyesen fel lett töltve a \textbf{coefficient} file-ból.
+A \textbf{coefficient} file:
+\begin{verbatim}
+	memory_initialization_radix=16;
+	memory_initialization_vector=00A,00B,00C,00D,00E,00F,010,011,012,013,014,015,016,017,018,019;
+\end{verbatim}
+
+A szimuláció eredménye:
+
+\includegraphics[scale=0.6]{bram_szimulacio.PNG}
+
+Megfigyelésem alapján a generált BRAM modul felfutó órajelre olvassa be a következő címet, és ugyanúgy felfutó órajelre teszi ki az adatot a kimenetre, de csak egy egész órajellel a cím beolvasása után.

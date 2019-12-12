@@ -1,0 +1,42 @@
+\begin{table}[h!]
+	\begin{center}
+		\caption{Különböző fázisokban elvégzendő műveletek}
+		\begin{tabular}{l|c|c|c|c|c}
+		\textbf{Állapot} & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & d\_out 	 & done \\
+		\hline         
+		READY            & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & 'U' 	 & '0' \\
+		\hline         
+		INIT          	 & $R_i$ 	 & $24$			        & data      	  & 'U' 	 & $done$ \\
+		\hline         
+		SEND\_IF01       & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & 'U' 	 & $done$ \\
+		\hline         
+		SEND1H\_INIT  	 & $T1H$ 	 & $R_{bit\_count}$     & $R_{data}$      & '1' 	 & $done$ \\
+		\hline         
+		SEND1H           & $R_i - 1$ & $R_{bit\_count}$     & $R_{data}$      & $d\_out$ & $done$ \\
+		\hline         
+		SEND1L\_INIT     & $T1L$     & $R_{bit\_count}$     & $R_{data}$      & '0'      & $done$ \\
+		\hline         
+		SEND1L           & $R_i - 1$ & $R_{bit\_count}$     & $R_{data}$      & $d\_out$ & $done$ \\
+		\hline         
+		SEND0H\_INIT     & $T0H$     & $R_{bit\_count}$     & $R_{data}$      & '1'      & $done$ \\
+		\hline         
+		SEND0H           & $R_i - 1$ & $R_{bit\_count}$     & $R_{data}$      & $d\_out$ & $done$ \\
+		\hline         
+		SEND0L\_INIT     & $T0L$     & $R_{bit\_count}$     & $R_{data}$      & '0'      & $done$ \\
+		\hline         
+		SEND0L           & $R_i - 1$ & $R_{bit\_count}$     & $R_{data}$      & $d\_out$ & $done$ \\
+		\hline
+		SHIFT\_CHECK     & $R_i$     & $R_{bit\_count} - 1$ & $R_{data}$      & $d\_out$ & $done$ \\
+		\hline
+		SHIFT	         & $R_i$     & $R_{bit\_count}$     & $R_{data} << 1$ & $d\_out$ & $done$ \\
+		\hline
+		SENDRES\_INIT    & $TRES$    & $R_{bit\_count}$     & $R_{data}$      & '0'      & $done$ \\
+		\hline
+		SENDRES          & $R_i - 1$ & $R_{bit\_count}$     & $R_{data}$      & $d\_out$ & $done$ \\
+		\hline
+		SEND\_DONE       & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & 'U' 	 & '1' \\
+		\hline
+		DONE\_TODO       & $R_i$ 	 & $R_{bit\_count}$     & $R_{data}$      & 'U' 	 & $done$ \\
+		\end{tabular}
+	\end{center}
+\end{table}
