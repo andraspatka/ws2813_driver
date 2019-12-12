@@ -7,16 +7,16 @@ A \textbf{WS2813\_Driver} modul szimulációja alatt a következőkre figyeltem:
 	\item A küldés befejezése után a \textbf{done} jel 1-esre lett-e állítva
 \end{itemize}
 
-A szimuláció során észrevevődött, hogy már az első kritérium nem teljesül:
+\tab A szimuláció során észrevevődött, hogy már az első kritérium nem teljesül:
 
 \includegraphics[scale=0.4]{driver_0_hibas.PNG}
 
-Látható, hogy nullás küldése esetén a kimenet \SI{0.41}{\micro\second}-ot van magas feszűltésgen tartva \SI{0.45}{\micro\second} helyett és \SI{0.91}{\micro\second}-ot van
+\tab Látható, hogy nullás küldése esetén a kimenet \SI{0.41}{\micro\second}-ot van magas feszűltésgen tartva \SI{0.45}{\micro\second} helyett és \SI{0.91}{\micro\second}-ot van
 alacsony feszűltségen tartva, \SI{0.85}{\micro\second} helyett.
 
 \includegraphics[scale=0.4]{driver_1_hibas.PNG}
 
-Itt látható, hogy egyes küldése esetén a kimenet \SI{0.81}{\micro\second}-ot van magas feszűltésgen tartva \SI{0.8}{\micro\second} helyett és \SI{0.51}{\micro\second}-ot van
+\tab Itt látható, hogy egyes küldése esetén a kimenet \SI{0.81}{\micro\second}-ot van magas feszűltésgen tartva \SI{0.8}{\micro\second} helyett és \SI{0.51}{\micro\second}-ot van
 alacsony feszűltségen tartva, \SI{0.45}{\micro\second} helyett.
 
 Ezt egyszerűen meg lehet oldani a ciklusszámok módosítása által.
@@ -36,33 +36,31 @@ Módosított ciklusszámok:
 	\end{itemize}
 \end{itemize}
 
-A frissített értékekkel a WS2813 protokollja már pontosan be van tartva.
+\tab A frissített értékekkel a WS2813 protokollja már pontosan be van tartva.
 
-Logikai egyesre:
+\tab Logikai egyesre:
 
 \includegraphics[scale=0.6]{driver_1_helyes.PNG}
 
-Logikai nullásra:
+\tab Logikai nullásra:
 
 \includegraphics[scale=0.6]{driver_0_helyes.PNG}
 
-A másik két követelmény is teljesül:
+\tab A másik két követelmény is teljesül:
 
 \includegraphics[scale=0.4]{driver_done.PNG}
 
-A 24 bit-es blokk elküldése után a done jel egyesre lett állítva és \SI{80.04}{\micro\second} alatt sikerült az egész 24 bit-es blokkot elküldeni.
+\tab A 24 bit-es blokk elküldése után a done jel egyesre lett állítva és \SI{80.04}{\micro\second} alatt sikerült az egész 24 bit-es blokkot elküldeni.
 
 
 \subsection{BRAM memória}
 
-A BRAM memóriának a használatát a következő két blogbejegyzés alapján tanultam meg: \href{http://vhdlguru.blogspot.com/2010/10/design-and-simulation-of-bram-using.html}{bram használata és tesztelése}
-és \href{https://vhdlguru.blogspot.com/2010/10/how-to-use-coe-file-for-initializing.html}{BRAM feltöltése coefficient file használata által}.
-A második blogbejegyzés alapján tanultam meg a BRAM memóriának a \textbf{coefficient} file alapján való feltöltését.
-A BRAM memória szimulációja alatt azt értem, hogy megvizsgálom, hogy a BRAM memória helyesen fel lett töltve a \textbf{coefficient} file-ból.
+\tab A BRAM memóriák IP Catalog-ból lettek kigenerálva\cite{vhdlguru2010bram}. Kezdőértékek egy \textbf{coefficient} file-ból lettek feltöltve\cite{vhdlguru2010bramcoe}.
 A \textbf{coefficient} file:
 \begin{verbatim}
 	memory_initialization_radix=16;
-	memory_initialization_vector=00A,00B,00C,00D,00E,00F,010,011,012,013,014,015,016,017,018,019;
+	memory_initialization_vector=00A,00B,00C,00D,
+		00E,00F,010,011,012,013,014,015,016,017,018,019;
 \end{verbatim}
 
 A szimuláció eredménye:

@@ -207,7 +207,7 @@ begin
                  '0' when others;
             
     --For the index register
-    DATA_Ri : process(clk_100, reset)
+    DATA_Ri : process(clk_100)
     begin
         if clk_100'event and clk_100 = '1' then
             Ri <= Ri_next;
@@ -215,7 +215,7 @@ begin
     end process DATA_Ri;
     
     --For the data register
-    DATA_Rdata : process(clk_100, reset)
+    DATA_Rdata : process(clk_100)
     begin
         if clk_100'event and clk_100 = '1' then
             Rdata <= Rdata_next;
@@ -223,7 +223,7 @@ begin
     end process DATA_Rdata;
     
     --For the bit_count register
-    DATA_Rbit_count : process(clk_100, reset)
+    DATA_Rbit_count : process(clk_100)
     begin
         if clk_100'event and clk_100 = '1' then
             Rbit_count <= Rbit_count_next;
