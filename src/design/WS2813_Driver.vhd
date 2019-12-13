@@ -4,8 +4,8 @@
 -- 
 -- Create Date: 11/07/2019 08:02:14 PM
 -- Project Name: Led fuzer vezerlese
--- Target Devices: Basys3 FPGA
 -- Module Name: WS2813_Driver - Behavioral
+-- Target Devices: Basys3 FPGA
 -- Description: 
 --      Module capable of driving a WS2813 LED strip
 --      Sends ONE 24 bit block to the WS2813 LED strip
@@ -16,6 +16,13 @@
 --      T1H = 0.80 us => 100 Mhz 80 cycle -> 79
 --      T1L = 0.45 us => 100 Mhz 45 cycle -> 39
 --      TRES = > 50 us => 100 Mhz >5000 cycle
+--
+-- If the above mentioned values don't seem to work:
+--      T0H = 0.22 us - 0.38 us => 100 Mhz -> 22 - 38  (-1 actual)
+--      T0L = 0.58 us - 1.6 us  => 100 Mhz -> 58 - 160 (-6 actual)
+--      T1H = 0.58 us - 1.6 us  => 100 Mhz -> 58 - 160 (-1 actual)
+--      T1L = 0.22 us - 0.42 us => 100 Mhz -> 22 - 42  (-6 actual)
+--      RES = > 280 us          => 100 Mhz -> 28000 
 -- 
 -- Revision:
 -- Revision 0.01 - File Created

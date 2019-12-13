@@ -3,8 +3,8 @@
 -- Engineer: Patka Zsolt-Andras
 -- 
 -- Create Date: 12/01/2019 07:15:28 PM
--- Module Name: controller - Behavioral
 -- Project Name: Led fuzer vezerlese
+-- Module Name: controller - Behavioral
 -- Target Devices: Basys3 FPGA 
 -- Description: 
 --      Module capable of receiving data from a bram module 
@@ -15,25 +15,27 @@
 -- Revision:
 -- Revision 0.01 - File Created
 -- Revision 0.02 - Updated documentation
+-- Revision 0.03 - Implemented logic
+-- Revision 0.04 - Renamed file: controller -> WS2813_Controller
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 
-entity controller is
+entity WS2813_Controller is
     port (
-        clk_100 : in std_logic; --100MHz clock
-        start   : in std_logic;
-        reset   : in std_logic;
+        clk_100   : in std_logic; --100MHz clock
+        start     : in std_logic;
+        reset     : in std_logic;
         bram_data : in std_logic_vector(23 downto 0);
-        d_out : out std_logic;
-        addr : out std_logic_vector(6 downto 0);
-        done    : out std_logic
+        d_out     : out std_logic;
+        addr      : out std_logic_vector(6 downto 0);
+        done      : out std_logic
     );
-end controller;
+end WS2813_Controller;
 
-architecture Behavioral of controller is		
+architecture Behavioral of WS2813_Controller is		
 
 component WS2813_Driver is
     port (
