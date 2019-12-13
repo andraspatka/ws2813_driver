@@ -22,9 +22,9 @@
 \item Adatok kiírása lehetséges a LED fűzérre
 \item Modularitás
 \begin{itemize}
-	\item Külön modul egy 24 bit-es blokk küldésére (WS2813\_Driver)
-	\item Külön modul a WS2813\_Driver modul BRAM-al való összekötésére (Controller)
-	\item Top level modul a Controllerek összekötésére a BRAM-okkal
+	\item WS2813\_Driver: Egy 24 bit-es blokkot küldő modul
+	\item WS2813\_Controller: Egy szálon több 24 bit-es blokkot kiküldő, a WS2813\_Driver modult fehasználó modul
+	\item WS2813\_TopLevel: Több ledfűzérre való kiírást lehetővég tevő modul, több WS2813\_Controller modul BRAM-al való összekötése által
 \end{itemize}
 \item Opcionális: 
 \begin{itemize}
