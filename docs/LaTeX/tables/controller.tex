@@ -1,0 +1,24 @@
+\begin{table}[!htb]
+	\begin{center}
+		\caption{WS2813\_Controller - Különböző fázisokban elvégzendő műveletek}
+		\begin{tabular}{l|c|c|c|c}
+		\textbf{Állapot} & $R_{addr}$ 	  & $Driver_{reset}$     & $Driver_{start}$      & done \\
+		\hline         
+        READY            & $R_{addr}$ 	  & '0'                  & '0'                   & '0'  \\
+        \hline         
+        INIT             & 89       	  & '0'                  & '0'                   & '0'  \\
+        \hline         
+        RESET\_DRIVER    & $R_{addr}$  	  & '1'                  & '0'                   & '0'  \\
+        \hline         
+        START\_DRIVER    & $R_{addr}$  	  & '0'                  & '1'                   & '0'  \\
+        \hline         
+        SEND             & $R_{addr}$  	  & '0'                  & '0'                   & '0'  \\
+        \hline         
+		ADDR\_CHECK      & $R_{addr}$     & '0'                  & '0'                   & '0'  \\
+        \hline         
+        ADDR\_DECR       & $R_{addr} - 1$ & '0'                  & '0'                   & '0'  \\
+        \hline         
+        FINISHED         & $R_{addr}$     & '0'                  & '0'                   & '1'  \\
+		\end{tabular}
+	\end{center}
+\end{table}

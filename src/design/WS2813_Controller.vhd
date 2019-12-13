@@ -17,6 +17,8 @@
 -- Revision 0.02 - Updated documentation
 -- Revision 0.03 - Implemented logic
 -- Revision 0.04 - Renamed file: controller -> WS2813_Controller
+-- Revision 0.05 - Address is now counted downwards (89 -> 0)
+--                 Added a constant so defining the number of 24 bit blocks to send is easier
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -55,11 +57,12 @@ end component WS2813_Driver;
         START_DRIVER,
         SEND,
         ADDR_CHECK,
-        ADDR_INC,
+        ADDR_DECR,
         FINISHED
     );
+    constant NUM_LEDS  : integer := 89;
     signal current_state, next_state: state_type;
-    signal Raddr, Raddr_next : std_logic_vector(6 downto 0);
+    signal Raddr, Raddr_next : signed(7 downto 0);
     signal Driver_reset : std_logic;
     signal Driver_start : std_logic;
     signal Driver_done : std_logic;
@@ -105,12 +108,12 @@ begin
                 if (Driver_done = '0') then
                     next_state <= SEND;
                 else
-                    next_state <= ADDR_INC;
+                    next_state <= ADDR_DECR;
                 end if;
-            when ADDR_INC =>
+            when ADDR_DECR =>
                 next_state <= ADDR_CHECK;
             when ADDR_CHECK =>
-                if (Raddr < B"101_1010") then --check if less than 90
+                if (Raddr >= 0) then
                     next_state <= RESET_DRIVER;
                 else
                     next_state <= FINISHED;
@@ -121,8 +124,8 @@ begin
     end process;
     
     with current_state select
-        Raddr_next <= B"000_0000" when INIT,
-                      std_logic_vector(unsigned(Raddr) + 1) when ADDR_INC,
+        Raddr_next <= to_signed(NUM_LEDS, Raddr'length) when INIT,
+                      signed(Raddr) - 1 when ADDR_DECR,
                       Raddr when others;
                  
     with current_state select
@@ -140,7 +143,7 @@ begin
                 '1' when FINISHED,
                 '0' when others;
     
-    addr <= Raddr;
+    addr <= std_logic_vector(unsigned(Raddr(6 downto 0)));
     
     --For the address register
     DATA_Raddr : process(clk_100)
