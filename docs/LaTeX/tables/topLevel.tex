@@ -1,0 +1,20 @@
+\begin{table}[H]
+	\begin{center}
+		\caption{WS2813\_TopLevel - Különböző fázisokban elvégzendő műveletek}
+		\begin{tabular}{l|c|c|c|c}
+		\textbf{Állapot} & $Controller_{reset}$     & $Controller_{start}$  & $BRAM_{enable}$ & done \\
+		\hline         
+        READY            & '0'                      & '0'                   & '0'             & '0'  \\
+        \hline         
+        INIT             & '0'                      & '0'                   & '1'             & '0'  \\
+        \hline         
+        RESET\_CTRLS     & '1'                      & '0'                   & $BRAM_{enable}$ & '0'  \\
+        \hline         
+        START\_CTRLS     & '0'                      & '1'                   & $BRAM_{enable}$ & '0'  \\
+        \hline         
+        SEND             & '0'                      & '0'                   & $BRAM_{enable}$ & '0'  \\
+        \hline         
+        FINISHED         & '0'                      & '0'                   & '0'             & '1'  \\
+		\end{tabular}
+	\end{center}
+\end{table}
