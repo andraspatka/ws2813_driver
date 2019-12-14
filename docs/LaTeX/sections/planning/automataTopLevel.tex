@@ -1,0 +1,33 @@
+\tab Ennek a modulnak a feladata a LED-fűzérek összekötése a BRAM modulokkal. Egy generikus változó által lehet definiálni, hogy hány \textbf{WS2813\_Controller} szükséges a modulban (hány LED-fűzért kell megvezérelni).
+A \textbf{WS2813\_Controller} modulok automatikusan lesznek kigenerálva, a generikus változó függvényében, viszont a BRAM modulokat muszáj kézzel kigenerálni és beilleszteni az adott modulba a megfelelő helyre.
+
+\subsubsection{Elvégzendő RT műveletek azonosítása}
+
+\tab A modulnak a feladata már egyszerű, csak össze kell kösse a már meglévő modulokat, ezért kevés logikát is tartalmaz, kevés RT művelet azonosítható. 
+A modulnak tudnia kell, hogy a \textbf{WS2813\_Controller} moduljai mikor fejezték be a küldést. Ezért szükséges ezeknek a moduloknak a \textbf{done} jelei között egy logikai ÉS művelet elvégzése.
+
+\tab RT művelet: $done \Leftarrow Controller\_done(0) \& ... \& Controller\_done(n - 1)$
+
+
+\subsubsection{Adatfüggőségek identifikálása}
+
+\tab Mivel nagyon egyszerű RT műveletekkel meg lehet oldani az adott feladatot, nem merűlnek fel adatfüggőségek.
+
+
+\subsubsection{Célregiszterek azonosítása}
+
+\tab Nincs szükség külön célregiszterekre a feladat megoldása érdekében.
+
+
+\subsubsection{Különböző fázisokban elvégzendő műveletek}
+
+TODO
+
+
+\subsubsection{Kapcsolási rajz}
+
+TODO
+
+\subsubsection{Állapotdiagram}
+
+TODO
