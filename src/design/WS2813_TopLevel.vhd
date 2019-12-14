@@ -31,16 +31,6 @@ end WS2813_TopLevel;
 
 architecture Behavioral of WS2813_TopLevel is
 
-function and_reduce(a : std_logic_vector) return std_logic is
-    variable ret : std_logic;
-begin
-    for i in a'range loop
-        ret := ret and a(i);
-    end loop;
-
-    return ret;
-end function and_reduce;
-
 component WS2813_Controller is
     port (
         clk_100   : in std_logic; --100MHz clock
@@ -70,6 +60,11 @@ component blk_mem_gen_1 is
     douta : OUT STD_LOGIC_VECTOR(23 DOWNTO 0)
   );
 end component;
+
+---------------------------------------------------------------------------------------------------------------
+-- INSERT ADDITIONAL BRAM MODULES COMPONENT DECLARATIONS HERE
+
+---------------------------------------------------------------------------------------------------------------
 
     type address_array_type is array(N-1 downto 0) of std_logic_vector(6 downto 0);
     type data_array_type is array(N-1 downto 0) of std_logic_vector(23 downto 0);
@@ -108,6 +103,13 @@ begin
         addra => Bram_addr(1),
         douta => Bram_dout(1)
     );
+
+---------------------------------------------------------------------------------------------------------------
+-- INSERT ADDITIONAL BRAM INSTANTIATIONS HERE
+
+---------------------------------------------------------------------------------------------------------------
+
+
 -- Instantiating the Controller modules
     ctrl_gen: for i in d_out'RANGE GENERATE
         ctrlx : WS2813_Controller port map (

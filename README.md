@@ -12,7 +12,24 @@ Ez tartalmazza az általam írt dokumentációt, plusz a LED fűzér adatlapját
 
 Ez a mappa tartalmazza a forráskódot. 
 
+## Vivado projekt felépítése
+
+A vivado projektet gyorsan két lépésből, két script segítségével fel lehet építeni:
+ - prep.py
+ - build.tcl
+ 
+Mindkét script az src mappában található.
+
+Útmutató:
+ - prep.py script futtatása
+   - Ez létrehoz egy "vivado" nevezetű mappát és ide bemásolja a szükséges állományokat
+ - Ezután a Vivado program elindítása után **Tools** -> **Run Tcl Script...** és a vivado mappában levő build.tcl script kiválasztása
+
+A lépések követése után a projekt fel lesz építve, viszont még szükséges a projekthez a BRAM memóriák hozzáadása. 
+
 ## BRAM hozzáadása a design-hoz
+
+**Aktuálisan a WS2813_TopLevel modulban két BRAM komponens van definiálva, ahhoz, hogy a projekt lefusson, két BRAM modult kell a projekthez hozzáadni. Hogyha több BRAM modulra van szükség (több ledfűzért kell vezérelni), ez esetben még hozzá kell adni a projekthez plusz BRAM modulokat és a WS2813_TopLevel állományt a kijelölt helyeken kell módosítani.**
 
 Vivado design suite-ban:
  - IP Catalog
@@ -20,12 +37,10 @@ Vivado design suite-ban:
  - Block memory generator
  - Single port ROM opció
    - Width: 24
-   - Depth: 100
+   - Depth: 90
  - Algorithm: Low Power
- - Other options:
-   - Új *.coe file létrehozása
-   - A következő példakód szerint kitölteni a coe file-t:
-   - ```memory_initialization_radix=16;memory_initialization_vector=001,002,003,004,005,006,007,008,009,00A,00B,00C,00D,00E,00F,010; ```
+ - Other options (BRAM memória adattal való feltöltése):
+   - Új *.coe file létrehozása / A már meglévő coe file hozzáadása
    - "load init file" kipipálása
    - init file hozzáadása
-   - 
+ - OK gomb
