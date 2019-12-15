@@ -44,3 +44,13 @@ Vivado design suite-ban:
    - "load init file" kipipálása
    - init file hozzáadása
  - OK gomb
+
+## Színek
+
+A BRAM memóriába a színeket GRB formában kell feltölteni, tehát:
+ - piros: 00FF00
+ - zöld: FF0000
+ - c. sárga: FFFF00
+ - kék: 0000FF
+ - fehér: FFFFFF
+ - magenta: 00FFFF
