@@ -50,11 +50,11 @@ entity WS2813_Driver is
 end WS2813_Driver;
 
 architecture Behavioral of WS2813_Driver is
-    constant T0H  : integer := 39;
-    constant T0L  : integer := 79;
-    constant T1H  : integer := 79;
-    constant T1L  : integer := 39;
-    constant TRES : integer := 5000;
+    constant T0H  : integer := 29;
+    constant T0L  : integer := 69;
+    constant T1H  : integer := 69;
+    constant T1L  : integer := 29;
+    constant TRES : integer := 29000;
     
     type state_type is (
         READY,
@@ -81,7 +81,7 @@ architecture Behavioral of WS2813_Driver is
     );
     signal current_state, next_state: state_type;
     signal Rbit_count, Rbit_count_next : integer range 0 to 23;
-    signal Ri, Ri_next : integer range 0 to 5100;
+    signal Ri, Ri_next : integer range 0 to 29000;
     signal Rdata, Rdata_next: std_logic_vector(23 downto 0);
     
 begin
