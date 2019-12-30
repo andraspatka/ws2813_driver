@@ -1,6 +1,7 @@
-\tab Működés közbeni tesztelésre az FPGA-ba beépített ILA (Integrated Logic Analyser) volt felhasználva. A tesztelés beállításához a TCL script-es megoldás\cite{brassai2018ukda_ila} volt felhasználva.
+\tab Működés közbeni tesztelésre az FPGA-ba beépített ILA (Integrated Logic Analyser) és egy Tektronix logikai analizátorral volt elvégezve. A tesztelés beállításához (ILA) a TCL script-es megoldás\cite{brassai2018ukda_ila} volt felhasználva.
+A Tektronix logikai analizátorral való teszteléssel a vezető tanár segített.
 
-\subsection{WS2813\_Driver}
+\subsection{WS2813\_Driver - ILA}
 
 \tab Ennél a modulnál szükség van egy 24 bit-es bementre. Mivel annyi kapcsoló nem található a választott FPGA lapon, ezért a modul le lett egyszerűsítve, a tesztelés megkönnyebítéséért. 
 24 bemenet helyett csak 4 lett felhasználva, ezek be is lettek konfigurálva az fpga négy kapcsolójára.
@@ -31,6 +32,15 @@ Ezen a példán nem látszik, hogy a küldés az MSB-től (Most Significant Bit)
 
 \tab Látható, hogy a küldés az MSB-től van elkezdve. Ugyanakkor az is megfigyelhető, hogy a WS2813 protokollja be van tartva.
 
-\subsection{Teljes rendszer működés közbeni tesztelése}
+\subsection{Teljes rendszer működés közbeni tesztelése - Tektronix logikai analizátor}
 
-TODO
+\tab A laborban található Tektronix logikai analizátorral sikerült elvégezni a működés közbeni tesztelést. A tesztelés alatt látható volt, hogy a 24 bit-es blokkok
+helyesen küldődnek el, ugyanakkor az egyes bitek időzítése is helyesen történik.
+
+Egy 24 bites blokk:
+
+\includegraphics[scale=0.4]{tek00000.png}
+
+24 bites blokkok küldése és a közöttük levő késleltetés
+
+\includegraphics[scale=0.4]{tek00003.png}
