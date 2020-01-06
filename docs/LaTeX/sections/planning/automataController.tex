@@ -3,7 +3,7 @@
 \tab A \textbf{WS2813\_Driver} modul képes egy 24 bit-es blokk kiküldésére. Ez a modul teszi lehetővé, hogy több 24 bit-es blokk kiküldhető legyen a LED-fűzérre.
 
 \tab A \textbf{WS2813\_Driver} modul egy 24 bit-es blokk elküldése után a \textbf{done} jelét '1'-esre állítja, ezáltal jelzi a felsőbb szintű modulnak, hogy a küldés befejeződött.
-Ebben a szekcióban a \textbf{WS2813\_Driver} modul \textbf{done} jele $Driver_{done}$-ként lesz hivatkozva. A \textbf{done} a controller modul \textbf{done} jelére fog vonatkozni.
+Ebben a szekcióban a \textbf{WS2813\_Driver} modul \textbf{done} jelére $Driver_{done}$-ként lesz hivatkozva. A \textbf{done} a controller modul \textbf{done} jelére fog vonatkozni.
 Ugyanúgy a \textbf{WS2813\_Driver} modul \textbf{reset}, \textbf{start} $Driver_{reset}$ és $Driver_{start}$ lesznek.
 
 \subsubsection{Elvégzendő RT műveletek azonosítása}
@@ -11,12 +11,12 @@ Ugyanúgy a \textbf{WS2813\_Driver} modul \textbf{reset}, \textbf{start} $Driver
 \tab A címzéshez szükséges egy érték dekrementálása. A cím 0-tól 89-ig lehet (90 LED-es ledfűzér). A nullához való hasonlítás hatékonyabb, mint a fix értékhez való,
 de ebben az esetben nem ezért volt ez a megoldás felhasználva (max értékről dekrementálás nulláig). 
 
-\tab A BRAM feltöltésekor az az elvárt, hogy az az adat ami a BRAM memóriában a 0-ás címen van, az első LED-en lesz megjelenítve
+\tab A BRAM feltöltésekor az az elvárt, hogy az az adat ami a BRAM memóriában a 0-ás címen van, az első LED-en legyen megjelenítve
 (első LED-nek számít az ami a legközelebb van az FPGA laphoz). A WS2813 proktoll úgy van definiálva, hogy amint egy új adat érkezik, az összes LED elcsúsztatja a rajta levő értéket jobbra.
 Így az az adat ami elsőnek küldődik ki, az utolsó LED-en lesz megjelenítve. Tehát, ha 89-es címen levő adat küldődik ki elsőnek, ez lesz az utolsó LED-en megjelenítve. Értelemszerűen a 0-ás címen
 levő adat lesz az első LED-en megjelenítve.
 
-\tab Definiálható RT utasítások: $addr \Leftarrow num_leds$, $addr \Leftarrow addr - 1$
+\tab Definiálható RT utasítások: $addr \Leftarrow num\_{leds}$, $addr \Leftarrow addr - 1$
 
 \subsubsection{Adatfüggőségek identifikálása}
 
